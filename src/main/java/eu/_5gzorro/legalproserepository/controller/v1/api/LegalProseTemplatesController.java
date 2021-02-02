@@ -34,7 +34,7 @@ public interface LegalProseTemplatesController {
             @ApiResponse(responseCode = "400", description = "Invalid page or filter parameters provided",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @GetMapping("")
+    @GetMapping
     @PageableOperation
     ResponseEntity<Page<LegalProseTemplateDto>> getLegalProseTemplates(
             @RequestParam(required = false) final @Parameter(hidden = true) Pageable pageable,

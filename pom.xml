@@ -15,6 +15,7 @@
 	<description>A Spring Boot API written in Java for managing legal prose templates in the 5GZORRO ecosystem</description>
 	<properties>
 		<java.version>11</java.version>
+		<springdoc.version>1.5.3</springdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -36,20 +37,15 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.5.3</version>
+			<version>${springdoc.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-data-rest</artifactId>
-			<version>1.5.3</version>
+			<version>${springdoc.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.modelmapper</groupId>
-			<artifactId>modelmapper</artifactId>
-			<version>2.3.2</version>
-		</dependency>
 	</dependencies>
 
 	<build>
