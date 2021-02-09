@@ -1,4 +1,4 @@
-package eu._5gzorro.legalproserepository.controller;
+package eu._5gzorro.legalproserepository.controller.advice;
 
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import org.springframework.http.HttpHeaders;
