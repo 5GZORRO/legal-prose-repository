@@ -1,6 +1,7 @@
 package eu._5gzorro.legalproserepository.controller.v1.api;
 
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
+import eu._5gzorro.legalproserepository.controller.v1.response.PagedTemplateResponse;
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.PageableOperation;
@@ -30,13 +31,13 @@ public interface LegalProseTemplatesController {
     @Operation(description = "Retrieve a paged collection of APPROVED Legal Prose Templates according to paging and filter parameters", tags= { "trader", "admin" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "A Paged List of Approved Legal Prose Templates",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = PagedTemplateResponse.class)) }),
             @ApiResponse(responseCode = "400", description = "Invalid page or filter parameters provided",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping
     @PageableOperation
-    ResponseEntity<Page<LegalProseTemplateDto>> getLegalProseTemplates(
+    ResponseEntity<PagedTemplateResponse> getLegalProseTemplates(
             @RequestParam(required = false) final @Parameter(hidden = true) Pageable pageable,
             @RequestParam(required = false) final Optional<String> filterText);
 

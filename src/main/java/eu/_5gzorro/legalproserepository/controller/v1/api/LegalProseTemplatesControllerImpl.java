@@ -2,6 +2,7 @@ package eu._5gzorro.legalproserepository.controller.v1.api;
 
 import eu._5gzorro.legalproserepository.LegalProseRepositoryApplication;
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
+import eu._5gzorro.legalproserepository.controller.v1.response.PagedTemplateResponse;
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.PageableOperation;
@@ -31,7 +32,7 @@ public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesCon
 
     private static final Logger log = LogManager.getLogger(LegalProseTemplatesControllerImpl.class);
 
-    public ResponseEntity<Page<LegalProseTemplateDto>> getLegalProseTemplates(final Pageable pageable, final Optional<String> filterText) {
+    public ResponseEntity<PagedTemplateResponse> getLegalProseTemplates(final Pageable pageable, final Optional<String> filterText) {
 
         // TODO: Implementation
         return ResponseEntity
