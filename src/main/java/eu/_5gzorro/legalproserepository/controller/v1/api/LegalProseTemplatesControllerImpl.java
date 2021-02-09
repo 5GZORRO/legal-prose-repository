@@ -1,5 +1,6 @@
 package eu._5gzorro.legalproserepository.controller.v1.api;
 
+import eu._5gzorro.legalproserepository.LegalProseRepositoryApplication;
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -25,6 +28,8 @@ import java.util.Optional;
 
 @RestController
 public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesController {
+
+    private static final Logger log = LogManager.getLogger(LegalProseTemplatesControllerImpl.class);
 
     public ResponseEntity<Page<LegalProseTemplateDto>> getLegalProseTemplates(final Pageable pageable, final Optional<String> filterText) {
 
