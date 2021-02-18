@@ -6,12 +6,10 @@ import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplateFile;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
-import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateFileNotFoundException;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateIOException;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateNotFoundException;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateStatusException;
 import eu._5gzorro.legalproserepository.model.mapper.LegalProseTemplateMapper;
-import eu._5gzorro.legalproserepository.repository.LegalProseTemplateFileRepository;
 import eu._5gzorro.legalproserepository.repository.LegalProseTemplateRepository;
 import eu._5gzorro.legalproserepository.repository.specification.LegalProseTemplateSpecs;
 import org.apache.logging.log4j.LogManager;
@@ -36,9 +34,6 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
     @Autowired
     LegalProseTemplateRepository templateRepository;
-
-    @Autowired
-    LegalProseTemplateFileRepository templateFileRepository;
 
     @Autowired
     ModelMapper mapper;
@@ -68,7 +63,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
     public String createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file) {
 
         // TODO: Generate a DID for the template
-        String templateId = UUID.randomUUID().toString();
+        String templateId = request.getName();
 
         LegalProseTemplate template = new LegalProseTemplate()
                 .id(templateId)
