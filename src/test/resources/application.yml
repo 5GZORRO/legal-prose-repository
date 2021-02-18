@@ -1,0 +1,10 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: "jdbc:h2:mem:legal_prose_repository"
+    driverClassName: org.h2.Driver
+    username: 5gzorro_admin
+    password: 5gzorro

@@ -8,7 +8,8 @@ import java.util.Objects;
 public class PagedTemplateResponse {
     private Page<LegalProseTemplateDto> pagedTemplates;
 
-    public PagedTemplateResponse() {
+    public PagedTemplateResponse(Page<LegalProseTemplateDto> pagedTemplates) {
+        this.pagedTemplates = pagedTemplates;
     }
 
     public Page<LegalProseTemplateDto> getPagedTemplates() {

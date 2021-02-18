@@ -12,7 +12,7 @@ public class LegalProseTemplateDto {
     private String description;
     private TemplateStatus status;
     private LocalDateTime created;
-    private LocalDateTime updated;
+    private LocalDateTime statusUpdated;
     private LocalDateTime archived;
 
     public LegalProseTemplateDto() {
@@ -58,12 +58,12 @@ public class LegalProseTemplateDto {
         this.created = created;
     }
 
-    public LocalDateTime getUpdated() {
-        return updated;
+    public LocalDateTime getStatusUpdated() {
+        return statusUpdated;
     }
 
-    public void setUpdated(LocalDateTime updated) {
-        this.updated = updated;
+    public void setStatusUpdated(LocalDateTime statusUpdated) {
+        this.statusUpdated = statusUpdated;
     }
 
     public LocalDateTime getArchived() {
