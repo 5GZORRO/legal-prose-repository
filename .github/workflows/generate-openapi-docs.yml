@@ -21,7 +21,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Generate openapi docs
-        run: ./mvnw -X springdoc-openapi:generate
+        run: ./mvnw verify -DskipTests
       - run: ls
       - name: Add & Commit
         uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
