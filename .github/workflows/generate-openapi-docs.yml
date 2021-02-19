@@ -28,4 +28,4 @@ jobs:
         with:
           add: './docs/'
           message: 'Github Action: update OpenAPI docs commit'
-          push: false          
+          push: true          
