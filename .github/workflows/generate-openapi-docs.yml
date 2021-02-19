@@ -19,7 +19,7 @@ jobs:
       - name: Add & Commit
         uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
         with:
-          add: 'docs/swagger-ui'
+          add: 'docs/swagger'
           message: 'Github Action: update OpenAPI docs commit'
           push: false
           branch: $GITHUB_REF
