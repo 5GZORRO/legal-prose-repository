@@ -16,10 +16,11 @@ jobs:
           java-version: 11
       - name: Generate openapi docs
         run: ./mvnw springdoc-openapi:generate
+      - run: ls
       - name: Add & Commit
         uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
         with:
-          add: 'docs/swagger'
+          add: './docs/'
           message: 'Github Action: update OpenAPI docs commit'
           push: false
           branch: $GITHUB_REF
