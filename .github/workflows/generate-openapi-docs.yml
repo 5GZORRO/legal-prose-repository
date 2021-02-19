@@ -23,10 +23,12 @@ jobs:
       - name: Generate openapi docs
         run: ./mvnw verify -DskipTests
       - run: ls
+      - name: Branch name
+        run: echo running on branch ${GITHUB_REF##*/}
       - name: Add & Commit
         uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
         with:
           add: './docs/'
           message: 'Github Action: update OpenAPI docs commit'
           push: false
-          branch: $GITHUB_REF
+          branch: ${GITHUB_REF##*/}
