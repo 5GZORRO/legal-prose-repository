@@ -1,17 +1,13 @@
 spring:
   jpa:
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
   datasource:
-    url: "jdbc:postgresql://localhost:5432/legal_prose_repository"
+    url: "jdbc:h2:mem:legal_prose_repository"
+    driverClassName: org.h2.Driver
     username: 5gzorro_admin
     password: 5gzorro
-    initialization-mode: never
 
 springdoc:
   api-docs:

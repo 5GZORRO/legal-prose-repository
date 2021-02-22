@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    active:
+      - dev
+  jpa:
+    #    show-sql: true
+    #    properties:
+    #      hibernate:
+    #        format_sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/legal_prose_repository"
+    username: 5gzorro_admin
+    password: 5gzorro
+    initialization-mode: never
