@@ -1,6 +1,8 @@
 package eu._5gzorro.legalproserepository.controller.v1.api;
 
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
+import eu._5gzorro.legalproserepository.controller.v1.request.constraint.ValidAccordTemplate;
+import eu._5gzorro.legalproserepository.controller.v1.request.validator.LegalProseTemplateFileValidator;
 import eu._5gzorro.legalproserepository.controller.v1.response.PagedTemplateResponse;
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
@@ -22,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Constraint;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -65,7 +68,7 @@ public interface LegalProseTemplatesController {
     @PostMapping(value="", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<String> proposeNewLegalProseTemplate(
             @Valid @RequestPart(value ="proposeTemplateRequest") final ProposeTemplateRequest proposeTemplateRequest,
-            @Valid @RequestParam(value = "templateFile") final MultipartFile templateFile);
+            @Valid @RequestParam(value = "templateFile") @ValidAccordTemplate final MultipartFile templateFile);
 
 
     @Operation(description = "Approve/Reject a newly proposed template or proposal to remove a template", tags= { "admin" })
