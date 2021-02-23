@@ -72,8 +72,9 @@ public class GovernanceManagerClientImpl implements GovernanceManagerClient {
             if(status.getStatusCode() == HttpStatus.SC_OK) {
                 return EntityUtils.toString(response.getEntity());
             }
-            else
+            else {
                 throw new HttpResponseException(status.getStatusCode(), status.getReasonPhrase());
+            }
         }
     }
 
