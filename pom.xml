@@ -18,6 +18,7 @@
 		<springdoc.version>1.5.3</springdoc.version>
 		<disruptor.version>3.4.2</disruptor.version>
 		<modelmapper.version>2.3.2</modelmapper.version>
+		<apacheHttpComponents.version>4.5.13</apacheHttpComponents.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -88,6 +89,12 @@
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>${modelmapper.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${apacheHttpComponents.version}</version>
 		</dependency>
 
 	</dependencies>

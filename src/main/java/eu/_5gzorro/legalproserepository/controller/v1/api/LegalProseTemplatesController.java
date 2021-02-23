@@ -2,11 +2,10 @@ package eu._5gzorro.legalproserepository.controller.v1.api;
 
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
 import eu._5gzorro.legalproserepository.controller.v1.request.constraint.ValidAccordTemplate;
-import eu._5gzorro.legalproserepository.controller.v1.request.validator.LegalProseTemplateFileValidator;
 import eu._5gzorro.legalproserepository.controller.v1.response.PagedTemplateResponse;
+import eu._5gzorro.legalproserepository.controller.v1.response.ProposalResponse;
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
-import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.PageableOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Constraint;
 import javax.validation.Valid;
-import java.util.Optional;
 
 @RequestMapping("/api/v1/legal-prose-templates")
 @Validated
@@ -66,7 +62,7 @@ public interface LegalProseTemplatesController {
     })
     @RequestBody(content = @Content(encoding = @Encoding(name = "proposeTemplateRequest", contentType = "application/json")))
     @PostMapping(value="", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<String> proposeNewLegalProseTemplate(
+    ResponseEntity<ProposalResponse> proposeNewLegalProseTemplate(
             @Valid @RequestPart(value ="proposeTemplateRequest") final ProposeTemplateRequest proposeTemplateRequest,
             @Valid @RequestParam(value = "templateFile") @ValidAccordTemplate final MultipartFile templateFile);
 

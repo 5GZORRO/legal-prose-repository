@@ -1,6 +1,7 @@
 package eu._5gzorro.legalproserepository.service;
 
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
+import eu._5gzorro.legalproserepository.controller.v1.response.ProposalResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ public interface LegalProseTemplateService {
      * @param file
      * @return the PROPOSAL Identifier
      */
-    String createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file);
+    ProposalResponse createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file);
 
     /**
      * Update the status of the prose template based on the outcome of the governance process

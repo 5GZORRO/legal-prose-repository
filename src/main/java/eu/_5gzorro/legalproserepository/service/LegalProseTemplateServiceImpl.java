@@ -1,17 +1,20 @@
 package eu._5gzorro.legalproserepository.service;
 
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
+import eu._5gzorro.legalproserepository.controller.v1.response.ProposalResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplateFile;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
+import eu._5gzorro.legalproserepository.model.exception.GovernanceProposalCreationFailed;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateIOException;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateNotFoundException;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateStatusException;
 import eu._5gzorro.legalproserepository.model.mapper.LegalProseTemplateMapper;
 import eu._5gzorro.legalproserepository.repository.LegalProseTemplateRepository;
 import eu._5gzorro.legalproserepository.repository.specification.LegalProseTemplateSpecs;
+import eu._5gzorro.legalproserepository.service.integration.governance.GovernanceManagerClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
@@ -25,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class LegalProseTemplateServiceImpl implements LegalProseTemplateService {
@@ -37,6 +39,9 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
     @Autowired
     ModelMapper mapper;
+
+    @Autowired
+    GovernanceManagerClient governanceMangerClient;
 
     @Override
     public Page<LegalProseTemplateDto> getLegalProseTemplates(Pageable pageable, String filterText) {
@@ -60,7 +65,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
     @Override
     @Transactional
-    public String createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file) {
+    public ProposalResponse createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file) {
 
         // TODO: Generate a DID for the template
         String templateId = request.getName();
@@ -83,10 +88,14 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
         templateRepository.save(template);
 
-        //TODO: Create a governance proposal
-
-        String proposalId = "NewProposalId";
-        return proposalId;
+        try {
+            String proposalId = governanceMangerClient.proposeNewTemplate(template.getId());
+            return new ProposalResponse(templateId, proposalId);
+        }
+        catch(Exception ex) {
+            log.error("Failed to create governance proposal for new prose template.", ex);
+            throw new GovernanceProposalCreationFailed();
+        }
     }
 
     @Override
@@ -134,9 +143,12 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
         template.status(TemplateStatus.ARCHIVE_PROPOSED);
         templateRepository.save(template);
 
-        //TODO: Create a governance proposal
-
-        String proposalId = "NewProposalId";
-        return proposalId;
+        try {
+            return governanceMangerClient.proposeArchiveTemplate(template.getId());
+        }
+        catch(Exception ex) {
+            log.error("Failed to create governance proposal when archiving prose template.", ex);
+            throw new GovernanceProposalCreationFailed();
+        }
     }
 }
