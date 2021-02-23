@@ -1,10 +1,7 @@
 package eu._5gzorro.legalproserepository.controller.advice;
 
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
-import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateFileNotFoundException;
-import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateIOException;
-import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateNotFoundException;
-import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateStatusException;
+import eu._5gzorro.legalproserepository.model.exception.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +58,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler({ LegalProseTemplateNotFoundException.class, LegalProseTemplateFileNotFoundException.class })
     @ResponseStatus(value=HttpStatus.NOT_FOUND)
     @ResponseBody
-    protected ApiErrorResponse handleEntityNofFoundException(HttpServletRequest req, Exception ex) {
+    protected ApiErrorResponse handleEntityNotFoundException(HttpServletRequest req, Exception ex) {
         return new ApiErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
@@ -72,7 +69,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return new ApiErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 
-    @ExceptionHandler({ LegalProseTemplateIOException.class })
+    @ExceptionHandler({ LegalProseTemplateIOException.class, GovernanceProposalCreationFailed.class })
     @ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     protected ApiErrorResponse handleErroredRequests(HttpServletRequest req, Exception ex) {

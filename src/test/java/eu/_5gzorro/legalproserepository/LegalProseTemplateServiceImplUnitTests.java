@@ -3,6 +3,7 @@ package eu._5gzorro.legalproserepository;
 
 import eu._5gzorro.legalproserepository.config.Config;
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
+import eu._5gzorro.legalproserepository.controller.v1.response.ProposalResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
@@ -13,7 +14,9 @@ import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateStatus
 import eu._5gzorro.legalproserepository.repository.LegalProseTemplateRepository;
 import eu._5gzorro.legalproserepository.service.LegalProseTemplateService;
 import eu._5gzorro.legalproserepository.service.LegalProseTemplateServiceImpl;
-import org.apache.logging.log4j.util.Strings;
+import eu._5gzorro.legalproserepository.service.integration.governance.GovernanceManagerClient;
+import eu._5gzorro.legalproserepository.service.integration.governance.GovernanceManagerClientImpl;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -31,10 +34,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.plaf.multi.MultiPanelUI;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,6 +59,9 @@ public class LegalProseTemplateServiceImplUnitTests {
 
     @MockBean
     private LegalProseTemplateRepository templateRepository;
+
+    @MockBean
+    private GovernanceManagerClient governanceManagerClient;
 
 
     // Get templates
@@ -145,8 +149,12 @@ public class LegalProseTemplateServiceImplUnitTests {
 
         final String requestingStakeholderId = "stakeholder1";
 
+        final String createdProposalId = "proposal1";
+        when(governanceManagerClient.proposeNewTemplate(anyString())).thenReturn(createdProposalId);
+
+        final String generatedTemplateId = "t1"; //TODO: use mocked value from ID&P when implemented
         // when
-        String proposalId = templateService.createLegalProseTemplate(requestingStakeholderId, request, templateFile);
+        ProposalResponse response = templateService.createLegalProseTemplate(requestingStakeholderId, request, templateFile);
 
         // then
         LegalProseTemplate expectedEntity = new LegalProseTemplate()
@@ -159,12 +167,13 @@ public class LegalProseTemplateServiceImplUnitTests {
         fileEntity.setData(templateFile.getBytes());
         expectedEntity.addFile(fileEntity);
 
+        verify(governanceManagerClient, times(1)).proposeNewTemplate(generatedTemplateId);
         verify(templateRepository, times(1)).save(expectedEntity);
 
+        assertNotNull(response);
+        assertEquals(generatedTemplateId, response.getEntityId());
+        assertEquals(createdProposalId, response.getCreatedProposalId());
     }
-
-
-
 
     // set status
     @Test
@@ -327,11 +336,13 @@ public class LegalProseTemplateServiceImplUnitTests {
     }
 
     @Test
-    public void archiveLegalProseTemplate_setsTemplateInActiveStateToArchiveProposedAndReturnsProposalId() {
+    public void archiveLegalProseTemplate_setsTemplateInActiveStateToArchiveProposedAndReturnsProposalId() throws IOException {
 
         // given
         final String templateId = "t1";
         final String requestingStakeholderId = "stakeholder1";
+        final String createdProposalId = "proposal1";
+
         LegalProseTemplate t1 = new LegalProseTemplate()
                 .id("t1")
                 .name("template 1")
@@ -339,6 +350,7 @@ public class LegalProseTemplateServiceImplUnitTests {
                 .status(TemplateStatus.ACTIVE);
 
         when(templateRepository.findById(templateId)).thenReturn(Optional.of(t1));
+        when(governanceManagerClient.proposeArchiveTemplate(anyString())).thenReturn(createdProposalId);
 
         // when
         String result = templateService.archiveLegalProseTemplate(requestingStakeholderId, templateId);
@@ -347,7 +359,8 @@ public class LegalProseTemplateServiceImplUnitTests {
 
         // then
         verify(templateRepository, times(1)).save(updatedTemplate);
-        assertTrue(Strings.isNotBlank(result));
-    }
+        verify(governanceManagerClient, times(1)).proposeArchiveTemplate(templateId);
+        assertEquals(createdProposalId, result);
 
+    }
 }
