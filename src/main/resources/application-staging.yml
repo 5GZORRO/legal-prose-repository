@@ -1,26 +1,16 @@
 spring:
+  profiles:
+    active:
+      - dev
   jpa:
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: "jdbc:h2:mem:legal_prose_repository"
-    driverClassName: org.h2.Driver
-    username: 5gzorro_admin
-    password: 5gzorro
-
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui
-
-server:
-  port: 8081
-
-logging:
-  level:
-    eu._5gzorro.legalproserepository.httpClient: DEBUG
+    url: jdbc:postgresql://${postgres.db.host:localhost}:${postgres.db.port:5432}/${postgres.db.name:legalproserepository}
+    driverClassName: org.postgresql.Driver
+    username: ${postgres.db.user:5gzorro_admin}
+    password: ${postgres.db.password:5gzorro}
 
 integrations:
   identity-permissions:
