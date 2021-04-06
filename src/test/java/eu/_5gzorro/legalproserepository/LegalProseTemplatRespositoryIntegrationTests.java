@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -31,12 +32,14 @@ public class LegalProseTemplatRespositoryIntegrationTests {
     void whenFilterTextNotEmpty_returnsRecordThatHaveNameOrDescriptionContainingFilterValue() {
         LegalProseTemplate t1 = new LegalProseTemplate()
                 .id("t1")
+                .handle(UUID.randomUUID())
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.PROPOSED);
 
         LegalProseTemplate t2 = new LegalProseTemplate()
                 .id("t2")
+                .handle(UUID.randomUUID())
                 .name("template 2")
                 .description(("description of template 2"))
                 .status(TemplateStatus.ACTIVE);
@@ -63,14 +66,17 @@ public class LegalProseTemplatRespositoryIntegrationTests {
 
     @Test
     void whenFilterTextEmpty_returnsUnfilteredResults() {
-        LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
-                .name("template 1")
-                .description(("description of template 1"))
-                .status(TemplateStatus.PROPOSED);
+    LegalProseTemplate t1 =
+        new LegalProseTemplate()
+            .id("t1")
+            .handle(UUID.randomUUID())
+            .name("template 1")
+            .description(("description of template 1"))
+            .status(TemplateStatus.PROPOSED);
 
         LegalProseTemplate t2 = new LegalProseTemplate()
                 .id("t2")
+                .handle(UUID.randomUUID())
                 .name("template 2")
                 .description(("description of template 2"))
                 .status(TemplateStatus.ACTIVE);

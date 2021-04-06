@@ -5,12 +5,18 @@ import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
-@Table(name="legal_prose_template")
+@Table(name="legal_prose_template", indexes = {
+        @Index(name = "ix_handle", unique = true, columnList = "handle")
+})
 public class LegalProseTemplate {
     @Id
     private String id;
+
+    @Column(name="handle", nullable = false)
+    private UUID handle;
 
     @Column(name="name", nullable = false)
     private String name;
@@ -39,6 +45,15 @@ public class LegalProseTemplate {
 
     public LegalProseTemplate id(String id) {
         this.id = id;
+        return this;
+    }
+
+    public UUID getHandle() {
+        return handle;
+    }
+
+    public LegalProseTemplate handle(UUID handle) {
+        this.handle = handle;
         return this;
     }
 
@@ -109,24 +124,46 @@ public class LegalProseTemplate {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LegalProseTemplate that = (LegalProseTemplate) o;
-        return id.equals(that.id) && name.equals(that.name) && status == that.status;
+        return id.equals(that.id) && handle.equals(that.handle) && name.equals(that.name) && Objects.equals(description, that.description) && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, status);
+        return Objects.hash(id, handle, name, description, status);
     }
 
     @Override
     public String toString() {
         return "LegalProseTemplate{" +
                 "id='" + id + '\'' +
+                ", handle=" + handle +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", created=" + created +
                 ", status=" + status +
+                ", file=" + file +
                 ", statusUpdated=" + statusUpdated +
                 ", archived=" + archived +
                 '}';
+    }
+
+    public LegalProseTemplate created(LocalDateTime created) {
+        this.created = created;
+        return this;
+    }
+
+    public LegalProseTemplate file(LegalProseTemplateFile file) {
+        this.file = file;
+        return this;
+    }
+
+    public LegalProseTemplate statusUpdated(LocalDateTime statusUpdated) {
+        this.statusUpdated = statusUpdated;
+        return this;
+    }
+
+    public LegalProseTemplate archived(LocalDateTime archived) {
+        this.archived = archived;
+        return this;
     }
 }

@@ -12,11 +12,21 @@ public class LegalProseTemplateStatusException extends RuntimeException {
     private final Set<TemplateStatus> permittedStatuses;
     private final TemplateStatus actualStatus;
 
+    /**
+     * Create a LegalProseTemplateStatusException with a collection of permitted target states
+     * @param permittedStatuses
+     * @param actualStatus
+     */
     public LegalProseTemplateStatusException(Collection<TemplateStatus> permittedStatuses, TemplateStatus actualStatus) {
         this.permittedStatuses = new HashSet<>(permittedStatuses);
         this.actualStatus = actualStatus;
     }
 
+    /**
+     * Create a LegalProseTemplateStatusException with a single permitted target state
+     * @param permittedStatus
+     * @param actualStatus
+     */
     public LegalProseTemplateStatusException(TemplateStatus permittedStatus, TemplateStatus actualStatus) {
         this(new HashSet<>(Collections.singleton(permittedStatus)), actualStatus);
     }

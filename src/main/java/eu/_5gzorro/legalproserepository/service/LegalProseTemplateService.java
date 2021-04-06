@@ -8,19 +8,29 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 public interface LegalProseTemplateService {
     Page<LegalProseTemplateDto> getLegalProseTemplates(Pageable pageable, String filterText);
     LegalProseTemplateDetailDto getLegalProseTemplate(String templateId);
 
     /**
-     * Creates a legal prose template in PROPOSED state and generates a governance proposal for admins to vote on
-     * The result of the subsequent proposal voting will determine the availa``bility of the template in the marketplace
+     * Creates a legal prose template in CREATING state and issues request for a DID
      * @param requestingStakeholderId
      * @param request
      * @param file
-     * @return the PROPOSAL Identifier
+     * @return the temporary Identifier (handle) for the template
      */
-    ProposalResponse createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file);
+    UUID createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file);
+
+  /**
+   * Complete the process of creating the template by assigning the provided DID to the template.
+   * Generates a governance proposal for admins to vote on, the result of the subsequent
+   * proposal voting will determine the availability of the template in the marketplace
+   * @param templateHandle
+   * @param did
+   */
+  void completeTemplateCreation(UUID templateHandle, String did);
 
     /**
      * Update the status of the prose template based on the outcome of the governance process
