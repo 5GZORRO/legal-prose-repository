@@ -9,6 +9,7 @@ import java.util.Objects;
 @RequestScope
 public class AuthData {
     private String userId = "AuthenticatedUserId"; // TODO: Extract from auth header/token in auth filter and set
+    private String authToken = "Token";
 
     public String getUserId() {
         return userId;
@@ -18,23 +19,32 @@ public class AuthData {
         this.userId = userId;
     }
 
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AuthData authData = (AuthData) o;
-        return userId.equals(authData.userId);
+        return userId.equals(authData.userId) && Objects.equals(authToken, authData.authToken);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId);
+        return Objects.hash(userId, authToken);
     }
 
     @Override
     public String toString() {
         return "AuthData{" +
                 "userId='" + userId + '\'' +
+                ", authToken='" + authToken + '\'' +
                 '}';
     }
 }

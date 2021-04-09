@@ -4,21 +4,22 @@ import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateReq
 import eu._5gzorro.legalproserepository.controller.v1.response.ProposalResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
+import eu._5gzorro.legalproserepository.model.AuthData;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplateFile;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
-import eu._5gzorro.legalproserepository.model.exception.GovernanceProposalCreationFailed;
-import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateIOException;
-import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateNotFoundException;
-import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateStatusException;
+import eu._5gzorro.legalproserepository.model.exception.*;
 import eu._5gzorro.legalproserepository.model.mapper.LegalProseTemplateMapper;
 import eu._5gzorro.legalproserepository.repository.LegalProseTemplateRepository;
 import eu._5gzorro.legalproserepository.repository.specification.LegalProseTemplateSpecs;
 import eu._5gzorro.legalproserepository.service.integration.governance.GovernanceManagerClient;
+import eu._5gzorro.legalproserepository.service.integration.identity.IdentityAndPermissionsApiClient;
+import eu._5gzorro.legalproserepository.utils.UuidSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class LegalProseTemplateServiceImpl implements LegalProseTemplateService {
@@ -41,7 +43,19 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
     ModelMapper mapper;
 
     @Autowired
-    GovernanceManagerClient governanceMangerClient;
+    GovernanceManagerClient governanceManagerClient;
+
+    @Autowired
+    IdentityAndPermissionsApiClient identityClient;
+
+    @Autowired
+    UuidSource uuidSource;
+
+    @Autowired
+    AuthData authData;
+
+    @Value("${callbacks.updateTemplateIdentity}")
+    private String updateTemplateIdentityCallbackUrl;
 
     @Override
     public Page<LegalProseTemplateDto> getLegalProseTemplates(Pageable pageable, String filterText) {
@@ -65,16 +79,24 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
     @Override
     @Transactional
-    public ProposalResponse createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file) {
+    public UUID createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file) {
 
-        // TODO: Generate a DID for the template
-        String templateId = request.getName();
+        UUID templateHandle = uuidSource.newUUID();
 
         LegalProseTemplate template = new LegalProseTemplate()
-                .id(templateId)
+                .id(templateHandle.toString())
+                .handle(templateHandle)
                 .name(request.getName())
                 .description(request.getDescription())
-                .status(TemplateStatus.PROPOSED);
+                .status(TemplateStatus.CREATING);
+
+        try {
+            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, templateHandle);
+            identityClient.createDID(callbackUrl, authData.getAuthToken());
+        }
+        catch (Exception ex) {
+            throw new DIDCreationException(ex);
+        }
 
         try {
             LegalProseTemplateFile templateFile = new LegalProseTemplateFile();
@@ -88,14 +110,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
         templateRepository.save(template);
 
-        try {
-            String proposalId = governanceMangerClient.proposeNewTemplate(template.getId());
-            return new ProposalResponse(templateId, proposalId);
-        }
-        catch(Exception ex) {
-            log.error("Failed to create governance proposal for new prose template.", ex);
-            throw new GovernanceProposalCreationFailed();
-        }
+        return templateHandle;
     }
 
     @Override
@@ -144,11 +159,35 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
         templateRepository.save(template);
 
         try {
-            return governanceMangerClient.proposeArchiveTemplate(template.getId());
+            return governanceManagerClient.proposeArchiveTemplate(template.getId());
         }
         catch(Exception ex) {
             log.error("Failed to create governance proposal when archiving prose template.", ex);
             throw new GovernanceProposalCreationFailed();
         }
+    }
+
+    @Transactional
+    public void completeTemplateCreation(UUID templateHandle, String did) {
+
+        LegalProseTemplate template = templateRepository.findById(templateHandle.toString())
+                .orElseThrow(() -> new LegalProseTemplateNotFoundException(templateHandle.toString()));
+
+        if(template.getStatus() != TemplateStatus.CREATING)
+            throw new LegalProseTemplateStatusException(TemplateStatus.PROPOSED, template.getStatus());
+
+        template = template
+                .id(did)
+                .status(TemplateStatus.PROPOSED);
+
+        try {
+            String proposalId = governanceManagerClient.proposeNewTemplate(template.getId());
+        }
+        catch(Exception ex) {
+            log.error("Failed to create governance proposal for new prose template.", ex);
+            throw new GovernanceProposalCreationFailed();
+        }
+
+        templateRepository.save(template);
     }
 }
