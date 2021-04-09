@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>eu._5gzorro</groupId>
 	<artifactId>legal-prose-repository</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 	<name>legal-prose-repository</name>
 	<description>A Spring Boot API written in Java for managing legal prose templates in the 5GZORRO ecosystem</description>
 	<properties>
@@ -21,6 +21,8 @@
 		<apacheHttpComponents.version>4.5.13</apacheHttpComponents.version>
 		<spring-cloud.version>2020.0.1</spring-cloud.version>
 		<io.github.openfeign.version>11.0</io.github.openfeign.version>
+
+    	<revision>0.0.1-SNAPSHOT</revision>
 	</properties>
 
 	<dependencyManagement>
@@ -74,6 +76,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
 		<dependency>

@@ -15,4 +15,4 @@ jobs:
       - name: Test
         run: echo ${{ env.RELEASE_VERSION }}
       - name: Publish Spring API
-        run: mvn clean compile -Pversion=${{ env.RELEASE_VERSION }} jib:build -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}
+        run: mvn -Drevision=${{ env.RELEASE_VERSION }} clean compile jib:build -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}
