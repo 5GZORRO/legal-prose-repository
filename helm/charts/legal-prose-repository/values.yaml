@@ -1,4 +1,4 @@
-dockerTag: v0.0.1
+dockerTag: v0.0.2
 
 governanceBaseUrl: "http://172.28.3.111/operatora/governance/"
 identityBaseUrl: "http://localhost:6200"
