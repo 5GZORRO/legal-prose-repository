@@ -7,10 +7,10 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: jdbc:postgresql://${postgres.db.host:localhost}:${postgres.db.port:5432}/${postgres.db.name:legalproserepository}
+    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}:${POSTGRES_DB_PORT:5432}/${POSTGRES_DB_NAME:governance}
     driverClassName: org.postgresql.Driver
-    username: ${postgres.db.user:5gzorro_admin}
-    password: ${postgres.db.password:5gzorro}
+    username: ${POSTGRES_DB_USER:5gzorro_admin}
+    password: ${POSTGRES_DB_PASSWORD:5gzorro}
 
 integrations:
   identity-permissions:
