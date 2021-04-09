@@ -190,7 +190,7 @@
 						<image>docker.pkg.github.com/5gzorro/legal-prose-repository/legal-prose-repository-api:${version}</image>
 					</to>
 					<container>
-						<mainClass>eu._5gzorro.governancemanager.LegalProseRepositoryApplication</mainClass>
+						<mainClass>eu._5gzorro.legalproserepository.LegalProseRepositoryApplication</mainClass>
 					</container>
 				</configuration>
 			</plugin>
