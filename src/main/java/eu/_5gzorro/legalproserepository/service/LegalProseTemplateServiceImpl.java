@@ -70,9 +70,17 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
     }
 
     @Override
-    public LegalProseTemplateDetailDto getLegalProseTemplate(String templateId) {
-        LegalProseTemplate template = templateRepository.findById(templateId)
-                .orElseThrow(() -> new LegalProseTemplateNotFoundException(templateId));
+    public LegalProseTemplateDetailDto getLegalProseTemplateByDid(String did) {
+        LegalProseTemplate template = templateRepository.findByDid(did)
+                .orElseThrow(() -> new LegalProseTemplateNotFoundException(did));
+
+        return LegalProseTemplateMapper.toLegalProseTemplateDetailDto(template);
+    }
+
+    @Override
+    public LegalProseTemplateDetailDto getLegalProseTemplateById(UUID id) {
+        LegalProseTemplate template = templateRepository.findById(id)
+                .orElseThrow(() -> new LegalProseTemplateNotFoundException(id.toString()));
 
         return LegalProseTemplateMapper.toLegalProseTemplateDetailDto(template);
     }
@@ -81,22 +89,20 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
     @Transactional
     public UUID createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file) {
 
-        UUID templateHandle = uuidSource.newUUID();
+        UUID id = uuidSource.newUUID();
 
         LegalProseTemplate template = new LegalProseTemplate()
-                .id(templateHandle.toString())
-                .handle(templateHandle)
+                .id(id)
                 .name(request.getName())
-                .description(request.getDescription())
-                .status(TemplateStatus.CREATING);
+                .description(request.getDescription());
 
-        try {
-            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, templateHandle);
-            identityClient.createDID(callbackUrl, authData.getAuthToken());
-        }
-        catch (Exception ex) {
-            throw new DIDCreationException(ex);
-        }
+//        try {
+//            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
+//            identityClient.createDID(callbackUrl, authData.getAuthToken());
+//        }
+//        catch (Exception ex) {
+//            throw new DIDCreationException(ex);
+//        }
 
         try {
             LegalProseTemplateFile templateFile = new LegalProseTemplateFile();
@@ -110,17 +116,17 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
         templateRepository.save(template);
 
-        return templateHandle;
+        return id;
     }
 
     @Override
     @Transactional
-    public void setLegalProseTemplateStatus(String templateId, boolean approved) {
+    public void setLegalProseTemplateStatus(String did, boolean approved) {
 
         //TODO: Verify Governance decision claim
 
-        LegalProseTemplate template = templateRepository.findById(templateId)
-                .orElseThrow(() -> new LegalProseTemplateNotFoundException(templateId));
+        LegalProseTemplate template = templateRepository.findByDid(did)
+                .orElseThrow(() -> new LegalProseTemplateNotFoundException(did));
 
         switch (template.getStatus()) {
             case PROPOSED:
@@ -130,7 +136,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
                 template.status(approved ? TemplateStatus.ARCHIVED : TemplateStatus.ACTIVE);
                 break;
             default:
-                log.error(String.format("Attempted to approve/reject a template not in PROPOSED/ARCHIVE_PROPOSED state with id %s.  Actual state: %s", template.getId(), template.getStatus()));
+                log.error(String.format("Attempted to approve/reject a template not in PROPOSED/ARCHIVE_PROPOSED state with did %s.  Actual state: %s", template.getDid(), template.getStatus()));
 
                 throw new LegalProseTemplateStatusException(
                   List.of(TemplateStatus.PROPOSED, TemplateStatus.ARCHIVE_PROPOSED),
@@ -142,16 +148,16 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
     @Override
     @Transactional
-    public String archiveLegalProseTemplate(String requestingStakeholderId, String templateId) {
+    public String archiveLegalProseTemplate(String requestingStakeholderId, String did) {
 
-        LegalProseTemplate template = templateRepository.findById(templateId)
-                .orElseThrow(() -> new LegalProseTemplateNotFoundException(templateId));
+        LegalProseTemplate template = templateRepository.findByDid(did)
+                .orElseThrow(() -> new LegalProseTemplateNotFoundException(did));
 
         if (template.getStatus() != TemplateStatus.ACTIVE) {
             log.error(
                 String.format(
-                  "Attempted to archive a template not in ACTIVE state with id %s.  Actual state: %s",
-                  template.getId(), template.getStatus()));
+                  "Attempted to archive a template not in ACTIVE state with did %s.  Actual state: %s",
+                  template.getDid(), template.getStatus()));
             throw new LegalProseTemplateStatusException(TemplateStatus.ACTIVE, template.getStatus());
         }
 
@@ -159,7 +165,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
         templateRepository.save(template);
 
         try {
-            return governanceManagerClient.proposeArchiveTemplate(template.getId());
+            return governanceManagerClient.proposeArchiveTemplate(template.getDid());
         }
         catch(Exception ex) {
             log.error("Failed to create governance proposal when archiving prose template.", ex);
@@ -168,20 +174,20 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
     }
 
     @Transactional
-    public void completeTemplateCreation(UUID templateHandle, String did) {
+    public void completeTemplateCreation(UUID id, String did) {
 
-        LegalProseTemplate template = templateRepository.findById(templateHandle.toString())
-                .orElseThrow(() -> new LegalProseTemplateNotFoundException(templateHandle.toString()));
+        LegalProseTemplate template = templateRepository.findById(id)
+                .orElseThrow(() -> new LegalProseTemplateNotFoundException(id.toString()));
 
         if(template.getStatus() != TemplateStatus.CREATING)
             throw new LegalProseTemplateStatusException(TemplateStatus.PROPOSED, template.getStatus());
 
         template = template
-                .id(did)
+                .did(did)
                 .status(TemplateStatus.PROPOSED);
 
         try {
-            String proposalId = governanceManagerClient.proposeNewTemplate(template.getId());
+            String proposalId = governanceManagerClient.proposeNewTemplate(template.getDid());
         }
         catch(Exception ex) {
             log.error("Failed to create governance proposal for new prose template.", ex);

@@ -86,11 +86,10 @@ public class LegalProseTemplateServiceImplUnitTests {
         LegalProseTemplateFile templateFile = new LegalProseTemplateFile();
         templateFile.setData("TEST DATA".getBytes(StandardCharsets.UTF_8));
 
-        UUID templateHandle = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
 
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id(templateHandle.toString())
-                .handle(templateHandle)
+                .id(id)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.PROPOSED);
@@ -107,51 +106,89 @@ public class LegalProseTemplateServiceImplUnitTests {
         assertEquals(expectedPage.getSize(), result.getSize());
 
         for (int i = 0; i < expectedPage.getSize(); i++) {
-            assertEquals(expectedPage.getContent().get(i).getId(), result.getContent().get(i).getId());
+            assertTrue(expectedPage.getContent().get(i).getId().toString().equals(result.getContent().get(i).getId()));
         }
     }
 
     // Get template
     @Test
-    public void getLegalProseTemplate_throwsLegalProseTemplateNotFoundException_whenNotFound() {
+    public void getLegalProseTemplateById_throwsLegalProseTemplateNotFoundException_whenNotFound() {
 
         // given
-        final String templateId = "1";
-        when(templateRepository.findById(templateId)).thenReturn(Optional.empty());
+        final UUID id = UUID.randomUUID();
+        when(templateRepository.findById(id)).thenReturn(Optional.empty());
 
         // then
-        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.getLegalProseTemplate(templateId));
+        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.getLegalProseTemplateById(id));
     }
 
     @Test
-    public void getLegalProseTemplate_returnsMatchingTemplateWithFileDataPopulated_whenFound() {
+    public void getLegalProseTemplateById_returnsMatchingTemplateWithFileDataPopulated_whenFound() {
 
         // given
-        final String templateId = "1";
+        final UUID id = UUID.randomUUID();
         byte[] fileBytes = "Test data".getBytes();
 
         LegalProseTemplateFile fileEntity = new LegalProseTemplateFile();
         fileEntity.setData(fileBytes);
 
         LegalProseTemplate templateEntity = new LegalProseTemplate()
-                .id(templateId)
-                .handle(UUID.randomUUID())
+                .id(id)
                 .name("template 2")
                 .description(("description of template 2"))
                 .status(TemplateStatus.ACTIVE);
 
         templateEntity.addFile(fileEntity);
 
-        when(templateRepository.findById(templateId)).thenReturn(Optional.of(templateEntity));
+        when(templateRepository.findById(id)).thenReturn(Optional.of(templateEntity));
 
         // then
-        LegalProseTemplateDetailDto result = templateService.getLegalProseTemplate(templateId);
+        LegalProseTemplateDetailDto result = templateService.getLegalProseTemplateById(id);
 
         assertNotNull(result);
-        assertEquals(templateId, result.getId());
+        assertTrue(id.toString().equals(result.getId()));
         assertEquals(fileBytes, result.getTemplateFileData());
     }
 
+    @Test
+    public void getLegalProseTemplateByDid_throwsLegalProseTemplateNotFoundException_whenNotFound() {
+
+        // given
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb";
+        when(templateRepository.findByDid(did)).thenReturn(Optional.empty());
+
+        // then
+        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.getLegalProseTemplateByDid(did));
+    }
+
+    @Test
+    public void getLegalProseTemplateByDid_returnsMatchingTemplateWithFileDataPopulated_whenFound() {
+
+        // given
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb";
+        byte[] fileBytes = "Test data".getBytes();
+
+        LegalProseTemplateFile fileEntity = new LegalProseTemplateFile();
+        fileEntity.setData(fileBytes);
+
+        LegalProseTemplate templateEntity = new LegalProseTemplate()
+                .id(UUID.randomUUID())
+                .did(did)
+                .name("template 2")
+                .description(("description of template 2"))
+                .status(TemplateStatus.ACTIVE);
+
+        templateEntity.addFile(fileEntity);
+
+        when(templateRepository.findByDid(did)).thenReturn(Optional.of(templateEntity));
+
+        // then
+        LegalProseTemplateDetailDto result = templateService.getLegalProseTemplateByDid(did);
+
+        assertNotNull(result);
+        assertEquals(did, result.getId());
+        assertEquals(fileBytes, result.getTemplateFileData());
+    }
 
     // create
     @Test
@@ -165,20 +202,15 @@ public class LegalProseTemplateServiceImplUnitTests {
         MultipartFile templateFile = new MockMultipartFile("file1.cta", "file contents".getBytes());
 
         final String requestingStakeholderId = "stakeholder1";
-        UUID expectedTemplateHandle = UUID.randomUUID();
-        Mockito.when(uuidSource.newUUID()).thenReturn(expectedTemplateHandle);
+        UUID expectedId = UUID.randomUUID();
+        Mockito.when(uuidSource.newUUID()).thenReturn(expectedId);
 
-//        final String createdProposalId = "proposal1";
-//        when(governanceManagerClient.proposeNewTemplate(anyString())).thenReturn(createdProposalId);
-
-        //final String generatedTemplateId = "t1"; //TODO: use mocked value from ID&P when implemented
         // when
-        UUID createdTemplateHandle = templateService.createLegalProseTemplate(requestingStakeholderId, request, templateFile);
+        UUID id = templateService.createLegalProseTemplate(requestingStakeholderId, request, templateFile);
 
         // then
         LegalProseTemplate expectedEntity = new LegalProseTemplate()
-                .id(expectedTemplateHandle.toString())
-                .handle(expectedTemplateHandle)
+                .id(expectedId)
                 .name("t1")
                 .description(("template 1 description"))
                 .status(TemplateStatus.CREATING);
@@ -187,12 +219,9 @@ public class LegalProseTemplateServiceImplUnitTests {
         fileEntity.setData(templateFile.getBytes());
         expectedEntity.addFile(fileEntity);
 
-        //verify(governanceManagerClient, times(1)).proposeNewTemplate(generatedTemplateId);
         verify(templateRepository, times(1)).save(expectedEntity);
+        assertEquals(expectedId, id);
 
-        //assertNotNull(templateHandle);
-        assertEquals(expectedTemplateHandle, createdTemplateHandle);
-        //assertEquals(createdProposalId, response.getCreatedProposalId());
     }
 
     // set status
@@ -200,59 +229,67 @@ public class LegalProseTemplateServiceImplUnitTests {
     public void setLegalProseTemplateStatus_throwsExceptionIfTemplateNotFound() {
 
         // given
-        final String templateId = "1";
-        when(templateRepository.findById(templateId)).thenReturn(Optional.empty());
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb";
+        when(templateRepository.findByDid(did)).thenReturn(Optional.empty());
 
         // then
-        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.setLegalProseTemplateStatus(templateId, true));
+        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.setLegalProseTemplateStatus(did, true));
     }
 
     @Test
     public void setLegalProseTemplateStatus_throwsExceptionIfNotInProposedOrArchiveProposedState() {
 
         // given
+        final String did1 = "did:5gzorro:345nmsdfhbsdjhfb1";
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
+                .id(UUID.randomUUID())
+                .did(did1)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.ACTIVE);
 
+        final String did2 = "did:5gzorro:345nmsdfhbsdjhfb2";
         LegalProseTemplate t2 = new LegalProseTemplate()
-                .id("t2")
+                .id(UUID.randomUUID())
+                .did(did2)
                 .name("template 2")
                 .description(("description of template 2"))
                 .status(TemplateStatus.ARCHIVED);
 
+        final String did3 = "did:5gzorro:345nmsdfhbsdjhfb3";
         LegalProseTemplate t3 = new LegalProseTemplate()
-                .id("t3")
+                .id(UUID.randomUUID())
+                .did(did3)
                 .name("template 3")
                 .description(("description of template 3"))
                 .status(TemplateStatus.REJECTED);
 
-        when(templateRepository.findById("t1")).thenReturn(Optional.of(t1));
-        when(templateRepository.findById("t2")).thenReturn(Optional.of(t2));
-        when(templateRepository.findById("t3")).thenReturn(Optional.of(t3));
+        when(templateRepository.findByDid(did1)).thenReturn(Optional.of(t1));
+        when(templateRepository.findByDid(did2)).thenReturn(Optional.of(t2));
+        when(templateRepository.findByDid(did3)).thenReturn(Optional.of(t3));
 
         // then
-        Throwable exception = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.setLegalProseTemplateStatus("t1", true));
-        Throwable exception1 = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.setLegalProseTemplateStatus("t2", true));
-        Throwable exception2 = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.setLegalProseTemplateStatus("t3", true));
+        Throwable exception = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.setLegalProseTemplateStatus(did1, true));
+        Throwable exception1 = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.setLegalProseTemplateStatus(did2, true));
+        Throwable exception2 = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.setLegalProseTemplateStatus(did3, true));
     }
 
     @Test
     public void setLegalProseTemplateStatus_setsTemplateInProposedStateToActiveWhenApproved() {
 
         // given
+        final String did1 = "did:5gzorro:345nmsdfhbsdjhfb1";
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
+                .id(UUID.randomUUID())
+                .did(did1)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.PROPOSED);
 
-        when(templateRepository.findById("t1")).thenReturn(Optional.of(t1));
+        when(templateRepository.findByDid(did1)).thenReturn(Optional.of(t1));
 
         // when
-        templateService.setLegalProseTemplateStatus("t1", true);
+        templateService.setLegalProseTemplateStatus(did1, true);
 
         final LegalProseTemplate updatedTemplate = t1.status(TemplateStatus.ACTIVE);
 
@@ -264,16 +301,18 @@ public class LegalProseTemplateServiceImplUnitTests {
     public void setLegalProseTemplateStatus_setsTemplateInProposedStateToRejectedWhenNotApproved() {
 
         // given
+        final String did1 = "did:5gzorro:345nmsdfhbsdjhfb1";
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
+                .id(UUID.randomUUID())
+                .did(did1)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.PROPOSED);
 
-        when(templateRepository.findById("t1")).thenReturn(Optional.of(t1));
+        when(templateRepository.findByDid(did1)).thenReturn(Optional.of(t1));
 
         // when
-        templateService.setLegalProseTemplateStatus("t1", false);
+        templateService.setLegalProseTemplateStatus(did1, false);
 
         final LegalProseTemplate updatedTemplate = t1.status(TemplateStatus.REJECTED);
 
@@ -285,16 +324,18 @@ public class LegalProseTemplateServiceImplUnitTests {
     public void setLegalProseTemplateStatus_setsTemplateInArchiveProposedStateToActiveWhenNotApproved() {
 
         // given
+        final String did1 = "did:5gzorro:345nmsdfhbsdjhfb1";
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
+                .id(UUID.randomUUID())
+                .did(did1)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.ARCHIVE_PROPOSED);
 
-        when(templateRepository.findById("t1")).thenReturn(Optional.of(t1));
+        when(templateRepository.findByDid(did1)).thenReturn(Optional.of(t1));
 
         // when
-        templateService.setLegalProseTemplateStatus("t1", false);
+        templateService.setLegalProseTemplateStatus(did1, false);
 
         final LegalProseTemplate updatedTemplate = t1.status(TemplateStatus.ACTIVE);
 
@@ -306,16 +347,18 @@ public class LegalProseTemplateServiceImplUnitTests {
     public void setLegalProseTemplateStatus_setsTemplateInArchiveProposedStateToArchivedWhenApproved() {
 
         // given
+        final String did1 = "did:5gzorro:345nmsdfhbsdjhfb1";
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
+                .id(UUID.randomUUID())
+                .did(did1)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.ARCHIVE_PROPOSED);
 
-        when(templateRepository.findById("t1")).thenReturn(Optional.of(t1));
+        when(templateRepository.findByDid(did1)).thenReturn(Optional.of(t1));
 
         // when
-        templateService.setLegalProseTemplateStatus("t1", true);
+        templateService.setLegalProseTemplateStatus(did1, true);
 
         final LegalProseTemplate updatedTemplate = t1.status(TemplateStatus.ARCHIVED);
 
@@ -328,59 +371,60 @@ public class LegalProseTemplateServiceImplUnitTests {
     public void archiveLegalProseTemplate_throwsExceptionIfTemplateNotFound() {
 
         // given
-        final String templateId = "1";
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb1";
         final String requestingStakeholderId = "stakeholder1";
 
-        when(templateRepository.findById(templateId)).thenReturn(Optional.empty());
+        when(templateRepository.findByDid(did)).thenReturn(Optional.empty());
 
         // then
-        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.archiveLegalProseTemplate(requestingStakeholderId, templateId));
+        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.archiveLegalProseTemplate(requestingStakeholderId, did));
     }
 
     @Test
     public void archiveLegalProseTemplate_throwsExceptionIfTemplateNotActive() {
 
         // given
-        final String templateId = "1";
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb1";
         final String requestingStakeholderId = "stakeholder1";
         final LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
+                .id(UUID.randomUUID())
+                .did(did)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.PROPOSED);
 
-        when(templateRepository.findById(templateId)).thenReturn(Optional.of(t1));
+        when(templateRepository.findByDid(did)).thenReturn(Optional.of(t1));
 
         // then
-        Throwable exception = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.archiveLegalProseTemplate(requestingStakeholderId, templateId));
+        Throwable exception = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.archiveLegalProseTemplate(requestingStakeholderId, did));
     }
 
     @Test
     public void archiveLegalProseTemplate_setsTemplateInActiveStateToArchiveProposedAndReturnsProposalId() throws IOException {
 
         // given
-        final String templateId = "t1";
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb1";
         final String requestingStakeholderId = "stakeholder1";
         final String createdProposalId = "proposal1";
 
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
-                .handle(UUID.randomUUID())
+                .id(UUID.randomUUID())
+                .did(did)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.ACTIVE);
 
-        when(templateRepository.findById(templateId)).thenReturn(Optional.of(t1));
+        when(templateRepository.findByDid(did)).thenReturn(Optional.of(t1));
         when(governanceManagerClient.proposeArchiveTemplate(anyString())).thenReturn(createdProposalId);
 
         // when
-        String result = templateService.archiveLegalProseTemplate(requestingStakeholderId, templateId);
+        String result = templateService.archiveLegalProseTemplate(requestingStakeholderId, did);
 
         final LegalProseTemplate updatedTemplate = t1.status(TemplateStatus.ARCHIVE_PROPOSED);
 
         // then
         verify(templateRepository, times(1)).save(updatedTemplate);
-        verify(governanceManagerClient, times(1)).proposeArchiveTemplate(templateId);
+        verify(governanceManagerClient, times(1)).proposeArchiveTemplate(did);
         assertEquals(createdProposalId, result);
 
     }
@@ -390,57 +434,57 @@ public class LegalProseTemplateServiceImplUnitTests {
     public void completeTemplateCreation_throwsExceptionIfTemplateWithIdMatchingTheProvidedHandleNotFound() {
 
         // given
-        UUID temporaryTemplateHandle = UUID.randomUUID();
-        String did = "newly_created_id";
+        final UUID id = UUID.randomUUID();
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb1";
 
         // when
-        when(templateRepository.findById(temporaryTemplateHandle.toString())).thenReturn(Optional.empty());
+        when(templateRepository.findById(id)).thenReturn(Optional.empty());
 
         // then
-        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.completeTemplateCreation(temporaryTemplateHandle, did));
+        Throwable exception = assertThrows(LegalProseTemplateNotFoundException.class, () -> templateService.completeTemplateCreation(id, did));
     }
 
     @Test
     public void completeTemplateCreation_throwsExceptionIfTemplateNotInCreatingState() {
 
         // given
-        UUID temporaryTemplateHandle = UUID.randomUUID();
-        String did = "newly_created_id";
+        final UUID id = UUID.randomUUID();
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb1";
 
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id(temporaryTemplateHandle.toString())
-                .handle(temporaryTemplateHandle)
+                .id(id)
+                .did(did)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.PROPOSED);
 
         // when
-        when(templateRepository.findById(temporaryTemplateHandle.toString())).thenReturn(Optional.of(t1));
+        when(templateRepository.findById(id)).thenReturn(Optional.of(t1));
 
         // then
-        Throwable exception = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.completeTemplateCreation(temporaryTemplateHandle, did));
+        Throwable exception = assertThrows(LegalProseTemplateStatusException.class, () -> templateService.completeTemplateCreation(id, did));
     }
 
     @Test
     public void completeTemplateCreation_setsNewIdAndStatusToApporvedAndRequestsAGovProposal() throws IOException {
 
         // given
-        UUID temporaryTemplateHandle = UUID.randomUUID();
-        String did = "newly_created_id";
+        final UUID id = UUID.randomUUID();
+        final String did = "did:5gzorro:345nmsdfhbsdjhfb1";
 
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id(temporaryTemplateHandle.toString())
-                .handle(temporaryTemplateHandle)
+                .id(id)
+                .did(did)
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.CREATING);
 
-        when(templateRepository.findById(temporaryTemplateHandle.toString())).thenReturn(Optional.of(t1));
+        when(templateRepository.findById(id)).thenReturn(Optional.of(t1));
 
         // when
-        templateService.completeTemplateCreation(temporaryTemplateHandle, did);
+        templateService.completeTemplateCreation(id, did);
 
-        final LegalProseTemplate updatedTemplate = t1.id(did).status(TemplateStatus.PROPOSED);
+        final LegalProseTemplate updatedTemplate = t1.did(did).status(TemplateStatus.PROPOSED);
 
         // then
         verify(templateRepository, times(1)).save(updatedTemplate);

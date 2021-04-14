@@ -8,7 +8,7 @@ public class LegalProseTemplateMapper {
     public static LegalProseTemplateDetailDto toLegalProseTemplateDetailDto(LegalProseTemplate template) {
         LegalProseTemplateDetailDto dto = new LegalProseTemplateDetailDto();
 
-        dto.setId(template.getId());
+        dto.setId(template.didAssigned() ? template.getDid() : template.getId().toString());
         dto.setName(template.getName());
         dto.setDescription(template.getDescription());
         dto.setStatus(template.getStatus());

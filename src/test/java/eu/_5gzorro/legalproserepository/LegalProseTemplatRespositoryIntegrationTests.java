@@ -30,16 +30,17 @@ public class LegalProseTemplatRespositoryIntegrationTests {
 
     @Test
     void whenFilterTextNotEmpty_returnsRecordThatHaveNameOrDescriptionContainingFilterValue() {
+
         LegalProseTemplate t1 = new LegalProseTemplate()
-                .id("t1")
-                .handle(UUID.randomUUID())
+                .id(UUID.randomUUID())
+                .did("did:5gzorro:345nmsdfhbsdjhfb1")
                 .name("template 1")
                 .description(("description of template 1"))
                 .status(TemplateStatus.PROPOSED);
 
         LegalProseTemplate t2 = new LegalProseTemplate()
-                .id("t2")
-                .handle(UUID.randomUUID())
+                .id(UUID.randomUUID())
+                .did("did:5gzorro:345nmsdfhbsdjhfb2")
                 .name("template 2")
                 .description(("description of template 2"))
                 .status(TemplateStatus.ACTIVE);
@@ -68,15 +69,15 @@ public class LegalProseTemplatRespositoryIntegrationTests {
     void whenFilterTextEmpty_returnsUnfilteredResults() {
     LegalProseTemplate t1 =
         new LegalProseTemplate()
-            .id("t1")
-            .handle(UUID.randomUUID())
+            .id(UUID.randomUUID())
+            .did("did:5gzorro:345nmsdfhbsdjhfb1")
             .name("template 1")
             .description(("description of template 1"))
             .status(TemplateStatus.PROPOSED);
 
         LegalProseTemplate t2 = new LegalProseTemplate()
-                .id("t2")
-                .handle(UUID.randomUUID())
+                .id(UUID.randomUUID())
+                .did("did:5gzorro:345nmsdfhbsdjhfb2")
                 .name("template 2")
                 .description(("description of template 2"))
                 .status(TemplateStatus.ACTIVE);

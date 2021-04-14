@@ -1,11 +1,9 @@
 package eu._5gzorro.legalproserepository.controller.v1.request;
 
-import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
 public class ProposeTemplateRequest {
 
-    @NotBlank
     private String name;
     private String description;
 
