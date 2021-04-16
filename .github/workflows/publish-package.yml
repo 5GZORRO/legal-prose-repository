@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     - run: mkdir ~/.kube/ && echo "${{ secrets.KUBECONFIG_FILE}}" | base64 -d > ~/.kube/config
     - run: echo "${{ secrets.CA_CRT }}" | base64 -d > ca.crt
     - run: echo "${{ secrets.TLS_KEY }}" | base64 -d > ta.key
@@ -43,5 +45,6 @@ jobs:
             --namespace operatora-ns \
             --repo ./helm/charts/legal-prose-repository/ \
             --values ./helm/charts/legal-prose-repository/values.yaml \
+            --set dockerTag=${{ env.RELEASE_VERSION }} \
             --set postgres.username=${{ secrets.OPERATORA_POSTGRES_USERNAME }} \
             --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }}
