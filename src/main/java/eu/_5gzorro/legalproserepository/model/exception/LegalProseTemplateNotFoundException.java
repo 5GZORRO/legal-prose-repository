@@ -12,6 +12,6 @@ public class LegalProseTemplateNotFoundException extends EntityNotFoundException
 
     @Override
     public String getMessage() {
-        return String.format("Legal Prose Template with id '%s' not found", id);
+        return String.format("Legal Prose Template with identifier '%s' not found", id);
     }
 }

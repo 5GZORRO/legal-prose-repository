@@ -1,6 +1,8 @@
 package eu._5gzorro.legalproserepository.model.entity;
 
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
+import org.apache.logging.log4j.util.Strings;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,14 +11,15 @@ import java.util.UUID;
 
 @Entity
 @Table(name="legal_prose_template", indexes = {
-        @Index(name = "ix_handle", unique = true, columnList = "handle")
+        @Index(name = "ix_did", unique = true, columnList = "did")
 })
 public class LegalProseTemplate {
     @Id
-    private String id;
+    private UUID id;
 
-    @Column(name="handle", nullable = false)
-    private UUID handle;
+    @NaturalId(mutable=true) //mutable to allow null -> did
+    @Column(name="did", unique = true)
+    private String did;
 
     @Column(name="name", nullable = false)
     private String name;
@@ -28,7 +31,7 @@ public class LegalProseTemplate {
     private LocalDateTime created = LocalDateTime.now();
 
     @Column(name="status", nullable = false)
-    private TemplateStatus status;
+    private TemplateStatus status = TemplateStatus.CREATING;
 
     @OneToOne(fetch = FetchType.LAZY,  cascade = CascadeType.ALL, orphanRemoval = true)
     private LegalProseTemplateFile file;
@@ -39,22 +42,26 @@ public class LegalProseTemplate {
 
     public LegalProseTemplate() {}
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public LegalProseTemplate id(String id) {
+    public LegalProseTemplate id(UUID id) {
         this.id = id;
         return this;
     }
 
-    public UUID getHandle() {
-        return handle;
+    public String getDid() {
+        return did;
     }
 
-    public LegalProseTemplate handle(UUID handle) {
-        this.handle = handle;
+    public LegalProseTemplate did(String did) {
+        this.did = did;
         return this;
+    }
+
+    public boolean didAssigned() {
+        return Strings.isNotEmpty(did);
     }
 
     public String getName() {
@@ -124,19 +131,19 @@ public class LegalProseTemplate {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LegalProseTemplate that = (LegalProseTemplate) o;
-        return id.equals(that.id) && handle.equals(that.handle) && name.equals(that.name) && Objects.equals(description, that.description) && status == that.status;
+        return id.equals(that.id) && Objects.equals(did, that.did) && name.equals(that.name) && Objects.equals(description, that.description) && status == that.status && Objects.equals(archived, that.archived);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, handle, name, description, status);
+        return Objects.hash(id, did, name, description, status, archived);
     }
 
     @Override
     public String toString() {
         return "LegalProseTemplate{" +
                 "id='" + id + '\'' +
-                ", handle=" + handle +
+                ", did=" + did +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", created=" + created +
