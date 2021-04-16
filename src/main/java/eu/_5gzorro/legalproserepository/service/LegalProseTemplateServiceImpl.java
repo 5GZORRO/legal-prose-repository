@@ -96,13 +96,13 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
                 .name(request.getName())
                 .description(request.getDescription());
 
-//        try {
-//            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
-//            identityClient.createDID(callbackUrl, authData.getAuthToken());
-//        }
-//        catch (Exception ex) {
-//            throw new DIDCreationException(ex);
-//        }
+        try {
+            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
+            identityClient.createDID(callbackUrl, authData.getAuthToken());
+        }
+        catch (Exception ex) {
+            throw new DIDCreationException(ex);
+        }
 
         try {
             LegalProseTemplateFile templateFile = new LegalProseTemplateFile();

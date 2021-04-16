@@ -19,7 +19,7 @@ public interface LegalProseTemplateService {
      * @param requestingStakeholderId
      * @param request
      * @param file
-     * @return the temporary Identifier (handle) for the template
+     * @return the local id for the template
      */
     UUID createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file);
 

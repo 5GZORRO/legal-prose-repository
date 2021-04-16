@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.data.domain.Pageable;
@@ -54,31 +53,18 @@ public interface LegalProseTemplatesController {
     @GetMapping("{identifier}")
     ResponseEntity<LegalProseTemplateDetailDto> getLegalProseTemplate(@PathVariable final String identifier);
 
-//    @Operation(description = "Propose a new Legal Prose Template. The request will be subject to a governance process before becoming available in the marketplace. Proposal ID is returned in the response", tags= { "trader", "admin" })
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "201", description = "A Legal Prose Template was created successfully. The temporary id of the newly created template is returned.",
-//                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)) }),
-//            @ApiResponse(responseCode = "400", description = "Invalid Prose Template definition provided",
-//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
-//    })
-//    @RequestBody(content = @Content(encoding = @Encoding(name = "proposeTemplateRequest", contentType = "application/json")))
-    @PostMapping
-    ResponseEntity<UUID> proposeNewLegalProseTemplate(
-            @Valid @RequestBody ProposeTemplateRequest proposeTemplateRequest);
-
-
-//    @Operation(description = "Propose a new Legal Prose Template. The request will be subject to a governance process before becoming available in the marketplace. Proposal ID is returned in the response", tags= { "trader", "admin" })
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "201", description = "A Legal Prose Template was created successfully. The temporary id of the newly created template is returned.",
-//                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)) }),
-//            @ApiResponse(responseCode = "400", description = "Invalid Prose Template definition provided",
-//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
-//    })
-//    @RequestBody(content = @Content(encoding = @Encoding(name = "proposeTemplateRequest", contentType = "application/json")))
-//    @PostMapping(value="", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    ResponseEntity<UUID> proposeNewLegalProseTemplate(
-//            @Valid @RequestPart(value ="proposeTemplateRequest") final ProposeTemplateRequest proposeTemplateRequest,
-//            @Valid @RequestParam(value = "templateFile") @ValidAccordTemplate final MultipartFile templateFile);
+    @Operation(description = "Propose a new Legal Prose Template. The request will be subject to a governance process before becoming available in the marketplace. Proposal ID is returned in the response", tags= { "trader", "admin" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "A Legal Prose Template was created successfully. The temporary id of the newly created template is returned.",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid Prose Template definition provided",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(encoding = @Encoding(name = "proposeTemplateRequest", contentType = "application/json")))
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<String> proposeNewLegalProseTemplate(
+             @RequestPart(name = "proposeTemplateRequest") @Valid final ProposeTemplateRequest proposeTemplateRequest,
+             @RequestPart(name = "templateFile") @ValidAccordTemplate final MultipartFile templateFile);
 
 
     @Operation(description = "Approve/Reject a newly proposed template or proposal to remove a template", tags= { "admin" })

@@ -57,30 +57,19 @@ public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesCon
                 .body(template);
     }
 
-    public ResponseEntity<UUID> proposeNewLegalProseTemplate(final ProposeTemplateRequest proposeTemplateRequest) {
+    public ResponseEntity<String> proposeNewLegalProseTemplate(final ProposeTemplateRequest proposeTemplateRequest, final MultipartFile templateFile) {
 
         final String requestingStakeholderId = authData.getUserId();
 
-        UUID templateHandle = templateService.createLegalProseTemplate(requestingStakeholderId, proposeTemplateRequest, null);
+        UUID templateId = templateService.createLegalProseTemplate(requestingStakeholderId, proposeTemplateRequest, templateFile);
 
         return ResponseEntity
                 .ok()
-                .body(templateHandle);
+                .body(templateId.toString());
     }
 
-//    public ResponseEntity<UUID> proposeNewLegalProseTemplate(final ProposeTemplateRequest proposeTemplateRequest, final MultipartFile templateFile) {
-//
-//        final String requestingStakeholderId = authData.getUserId();
-//
-//        UUID templateHandle = templateService.createLegalProseTemplate(requestingStakeholderId, proposeTemplateRequest, templateFile);
-//
-//        return ResponseEntity
-//                .ok()
-//                .body(templateHandle);
-//    }
-
-    public ResponseEntity<Void> updateTemplateIdentity(final UUID templateHandle, final DIDStateDto state) {
-        templateService.completeTemplateCreation(templateHandle, state.getDid());
+    public ResponseEntity<Void> updateTemplateIdentity(final UUID id, final DIDStateDto state) {
+        templateService.completeTemplateCreation(id, state.getDid());
 
         return ResponseEntity
                 .ok()
