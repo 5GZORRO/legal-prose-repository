@@ -65,7 +65,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
                 .or(LegalProseTemplateSpecs.descriptionContains(filterText));
 
         return templateRepository.findAll(spec, pageable)
-            .map(template -> mapper.map(template, LegalProseTemplateDto.class));
+            .map(template -> LegalProseTemplateMapper.toLegalProseTemplateDto(template));
 
     }
 

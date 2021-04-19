@@ -76,9 +76,9 @@ public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesCon
                 .build();
     }
 
-    public ResponseEntity<Void> setLegalStatementTemplateApprovalStatus(final String id, final boolean accept) {
+    public ResponseEntity<Void> setLegalStatementTemplateApprovalStatus(final String did, final boolean accept) {
 
-        templateService.setLegalProseTemplateStatus(id, accept);
+        templateService.setLegalProseTemplateStatus(did, accept);
 
         return ResponseEntity
                 .ok()
