@@ -96,13 +96,14 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
                 .name(request.getName())
                 .description(request.getDescription());
 
-        try {
-            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
-            identityClient.createDID(callbackUrl, authData.getAuthToken());
-        }
-        catch (Exception ex) {
-            throw new DIDCreationException(ex);
-        }
+// TODO:  reinstate this when ID&P is able to support the issuance of a DID for prose templates
+//        try {
+//            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
+//            identityClient.createDID(callbackUrl, authData.getAuthToken());
+//        }
+//        catch (Exception ex) {
+//            throw new DIDCreationException(ex);
+//        }
 
         try {
             LegalProseTemplateFile templateFile = new LegalProseTemplateFile();

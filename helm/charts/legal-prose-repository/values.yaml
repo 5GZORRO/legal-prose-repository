@@ -1,5 +1,5 @@
 governanceBaseUrl: "http://172.28.3.111/operatora/governance/"
-identityBaseUrl: "http://localhost:6200"
+identityBaseUrl: "http://172.28.3.153:6200"
 callbacks:
     updateTemplateIdentity: "http://172.28.3.111/operatora/legal-prose-repository/api/v1/governance-actions/%s/identity"
 
