@@ -20,3 +20,6 @@ integrations:
 
 callbacks:
   updateTemplateIdentity: ${UPDATE_TEMPLATE_IDENTITY_CALLBACK_URL:http://localhost:8081/api/v1/legal-prose-templates/%s/identity}
+
+server:
+  forward-headers-strategy: framework
