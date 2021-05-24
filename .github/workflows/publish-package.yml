@@ -39,12 +39,32 @@ jobs:
         config_file: .github/vpn/config.ovpn
         username: ${{ secrets.OVPN_USERNAME }}
         password: ${{ secrets.OVPN_PASSWORD }}
-    - name: Deploy to k8s cluster
+    - name: Deploy to operatora
       run: |
           helm upgrade legal-prose-api ./helm/charts/legal-prose-repository/ \
+            --install \
             --namespace operatora-ns \
             --repo ./helm/charts/legal-prose-repository/ \
             --values ./helm/charts/legal-prose-repository/values.yaml \
             --set dockerTag=${{ env.RELEASE_VERSION }} \
             --set postgres.username=${{ secrets.OPERATORA_POSTGRES_USERNAME }} \
-            --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }}
+            --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }} \
+            --set service.prefix=/operatora/legal-prose-repository \
+            --set governanceBaseUrl="http://172.28.3.111/operatora/governance/" \
+            --set identityBaseUrl="http://172.28.3.153:6200" \
+            --set callbacks.updateTemplateIdentity="http://172.28.3.111/operatora/legal-prose-repository/api/v1/governance-actions/%s/identity"
+    - name: Deploy LPR API to regulatora
+      run: |
+        helm upgrade legal-prose-api ./helm/charts/legal-prose-repository/ \
+          --install \
+          --namespace regulatora-ns \
+          --repo ./helm/charts/legal-prose-repository/ \
+          --values ./helm/charts/legal-prose-repository/values.yaml \
+          --set dockerTag=${{ env.RELEASE_VERSION }} \
+          --set postgres.username=${{ secrets.OPERATORA_POSTGRES_USERNAME }} \
+          --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }} \
+          --set postgres.name=operator_a_legal_prose \
+          --set service.prefix=/regulatora/legal-prose-repository \
+          --set governanceBaseUrl="http://172.28.3.111/regulatora/governance/" \
+          --set identityBaseUrl="http://172.28.3.153:6300" \
+          --set callbacks.updateTemplateIdentity="http://172.28.3.111/regulatora/legal-prose-repository/api/v1/governance-actions/%s/identity"

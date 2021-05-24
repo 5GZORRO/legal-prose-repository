@@ -1,8 +1,3 @@
-governanceBaseUrl: "http://172.28.3.111/operatora/governance/"
-identityBaseUrl: "http://172.28.3.153:6200"
-callbacks:
-    updateTemplateIdentity: "http://172.28.3.111/operatora/legal-prose-repository/api/v1/governance-actions/%s/identity"
-
 fullnameOverride: "legal-prose-app"
 
 serviceAccount:
@@ -14,7 +9,6 @@ serviceAccount:
 
 replicaCount: 1
 service:
-    prefix: /operatora/legal-prose-repository
     name: legal-prose-app
     type: ClusterIP
     appPort: 8081
@@ -40,7 +34,6 @@ imagePullSecrets:
 postgres:
     host: postgresql.postgres.svc.cluster.local
     port: 5432
-    name: operator_a_legal_prose
 
 probePath: /actuator/health
 
