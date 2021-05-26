@@ -6,6 +6,7 @@ import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.legalproserepository.model.AuthData;
+import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import eu._5gzorro.legalproserepository.service.LegalProseTemplateService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,9 +32,9 @@ public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesCon
     AuthData authData;
 
 
-    public ResponseEntity<PagedTemplateResponse> getLegalProseTemplates(final Pageable pageable, final String filterText) {
+    public ResponseEntity<PagedTemplateResponse> getLegalProseTemplates(final Pageable pageable, final List<TemplateCategory> categoryFilter, final String filterText) {
 
-        Page<LegalProseTemplateDto> page = templateService.getLegalProseTemplates(pageable, filterText);
+        Page<LegalProseTemplateDto> page = templateService.getLegalProseTemplates(pageable, categoryFilter, filterText);
         PagedTemplateResponse responseBody = new PagedTemplateResponse(page);
 
         return ResponseEntity

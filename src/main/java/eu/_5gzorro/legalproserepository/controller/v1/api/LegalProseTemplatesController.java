@@ -7,6 +7,7 @@ import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.legalproserepository.model.PageableOperation;
+import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,13 +23,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @RequestMapping("/api/v1/legal-prose-templates")
 @Validated
 public interface LegalProseTemplatesController {
 
-    @Operation(description = "Retrieve a paged collection of APPROVED Legal Prose Templates (without template file data) according to paging and filter parameters", tags= { "trader", "admin" })
+    @Operation(description = "Retrieve a paged collection of ACTIVE Legal Prose Templates (without template file data) according to paging and filter parameters", tags= { "trader", "admin" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "A Paged List of Approved Legal Prose Templates",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = PagedTemplateResponse.class)) }),
@@ -39,7 +41,8 @@ public interface LegalProseTemplatesController {
     @PageableOperation
     ResponseEntity<PagedTemplateResponse> getLegalProseTemplates(
             final @Parameter(hidden = true) Pageable pageable,
-            @RequestParam(required = false) final String filterText);
+            @RequestParam(required = false) @Parameter(description = "Optional comma separated list of TemplateCategory's to filter the response by") final List<TemplateCategory> categoryFilter,
+            @RequestParam(required = false) @Parameter(description = "Text to filter results by - applied to name and description of templates") final String filterText);
 
     @Operation(description = "Get a Legal Prose Template by id or DID", tags= { "trader", "admin" })
     @ApiResponses(value = {

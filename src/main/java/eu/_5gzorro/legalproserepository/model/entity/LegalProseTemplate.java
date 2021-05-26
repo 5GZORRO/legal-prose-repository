@@ -1,5 +1,6 @@
 package eu._5gzorro.legalproserepository.model.entity;
 
+import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.NaturalId;
@@ -26,6 +27,9 @@ public class LegalProseTemplate {
 
     @Column(name="description", nullable = false)
     private String description;
+
+    @Column(name="category")
+    private TemplateCategory category;
 
     @Column(name="created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
@@ -82,6 +86,12 @@ public class LegalProseTemplate {
         return this;
     }
 
+    public TemplateCategory getCategory() {
+        return category;
+    }
+
+
+
     public LocalDateTime getCreated() {
         return created;
     }
@@ -126,34 +136,6 @@ public class LegalProseTemplate {
         this.file = null;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LegalProseTemplate that = (LegalProseTemplate) o;
-        return id.equals(that.id) && Objects.equals(did, that.did) && name.equals(that.name) && Objects.equals(description, that.description) && status == that.status && Objects.equals(archived, that.archived);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, did, name, description, status, archived);
-    }
-
-    @Override
-    public String toString() {
-        return "LegalProseTemplate{" +
-                "id='" + id + '\'' +
-                ", did=" + did +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", created=" + created +
-                ", status=" + status +
-                ", file=" + file +
-                ", statusUpdated=" + statusUpdated +
-                ", archived=" + archived +
-                '}';
-    }
-
     public LegalProseTemplate created(LocalDateTime created) {
         this.created = created;
         return this;
@@ -172,5 +154,39 @@ public class LegalProseTemplate {
     public LegalProseTemplate archived(LocalDateTime archived) {
         this.archived = archived;
         return this;
+    }
+
+    public LegalProseTemplate category(TemplateCategory category) {
+        this.category = category;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LegalProseTemplate that = (LegalProseTemplate) o;
+        return id.equals(that.id) && Objects.equals(did, that.did) && name.equals(that.name) && Objects.equals(description, that.description) && category == that.category && status == that.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, did, name, description, category, status);
+    }
+
+    @Override
+    public String toString() {
+        return "LegalProseTemplate{" +
+                "id=" + id +
+                ", did='" + did + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", category=" + category +
+                ", created=" + created +
+                ", status=" + status +
+                ", file=" + file +
+                ", statusUpdated=" + statusUpdated +
+                ", archived=" + archived +
+                '}';
     }
 }

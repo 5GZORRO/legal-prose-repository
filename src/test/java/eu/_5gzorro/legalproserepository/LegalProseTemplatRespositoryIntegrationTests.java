@@ -1,6 +1,7 @@
 package eu._5gzorro.legalproserepository;
 
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
+import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
 import eu._5gzorro.legalproserepository.repository.LegalProseTemplateRepository;
 import eu._5gzorro.legalproserepository.repository.specification.LegalProseTemplateSpecs;
@@ -57,6 +58,44 @@ public class LegalProseTemplatRespositoryIntegrationTests {
         Specification<LegalProseTemplate> spec = Specification
                 .where(LegalProseTemplateSpecs.nameContains(filterText))
                 .or(LegalProseTemplateSpecs.descriptionContains(filterText));
+
+        Page<LegalProseTemplate> found = templateRepository.findAll(spec, page);
+
+        // then
+        assertEquals(1, found.getTotalElements());
+        assertEquals(t1, found.getContent().get(0));
+    }
+
+    @Test
+    void whenCategoryFilterSupplied_returnsRecordsThatHaveMatchingCategory() {
+
+        LegalProseTemplate t1 = new LegalProseTemplate()
+                .id(UUID.randomUUID())
+                .did("did:5gzorro:345nmsdfhbsdjhfb1")
+                .name("template 1")
+                .category(TemplateCategory.SLA)
+                .description(("description of template 1"))
+                .status(TemplateStatus.PROPOSED);
+
+        LegalProseTemplate t2 = new LegalProseTemplate()
+                .id(UUID.randomUUID())
+                .did("did:5gzorro:345nmsdfhbsdjhfb2")
+                .name("template 2")
+                .category(TemplateCategory.LICENSE)
+                .description(("description of template 2"))
+                .status(TemplateStatus.ACTIVE);
+
+        // given
+        List<LegalProseTemplate> templates = List.of(t1, t2);
+        templates.forEach(m -> entityManager.persist(m));
+        entityManager.flush();
+
+        // when
+        List<TemplateCategory> categoryFilter = List.of(TemplateCategory.SLA);
+
+        Pageable page = PageRequest.of(0, 10);
+        Specification<LegalProseTemplate> spec = Specification
+                .where(LegalProseTemplateSpecs.categoryIn(categoryFilter));
 
         Page<LegalProseTemplate> found = templateRepository.findAll(spec, page);
 
