@@ -19,11 +19,11 @@ image:
 
 resources:
     limits:
-        cpu: 2
-        memory: 4G
+        cpu: 500m
+        memory: 1G
     requests:
-        cpu: 1
-        memory: 2G
+        cpu: 500m
+        memory: 1G
 
 podSecurityContext: {}
 securityContext: {}
