@@ -3,14 +3,16 @@ package eu._5gzorro.legalproserepository.service;
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
+import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface LegalProseTemplateService {
-    Page<LegalProseTemplateDto> getLegalProseTemplates(Pageable pageable, String filterText);
+    Page<LegalProseTemplateDto> getLegalProseTemplates(Pageable pageable, List<TemplateCategory> categoryFilter, String filterText);
     LegalProseTemplateDetailDto getLegalProseTemplateById(UUID id);
     LegalProseTemplateDetailDto getLegalProseTemplateByDid(String did);
 

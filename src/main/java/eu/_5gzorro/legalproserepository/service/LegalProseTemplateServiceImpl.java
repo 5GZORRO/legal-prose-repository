@@ -7,6 +7,7 @@ import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.AuthData;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplateFile;
+import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
 import eu._5gzorro.legalproserepository.model.exception.*;
 import eu._5gzorro.legalproserepository.model.mapper.LegalProseTemplateMapper;
@@ -58,11 +59,13 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
     private String updateTemplateIdentityCallbackUrl;
 
     @Override
-    public Page<LegalProseTemplateDto> getLegalProseTemplates(Pageable pageable, String filterText) {
+    public Page<LegalProseTemplateDto> getLegalProseTemplates(Pageable pageable, List<TemplateCategory> categoryFilter, String filterText) {
 
         Specification<LegalProseTemplate> spec = Specification
-                .where(LegalProseTemplateSpecs.nameContains(filterText))
-                .or(LegalProseTemplateSpecs.descriptionContains(filterText));
+                .where(LegalProseTemplateSpecs.categoryIn(categoryFilter))
+                .and(LegalProseTemplateSpecs.nameContains(filterText)
+                        .or(LegalProseTemplateSpecs.descriptionContains(filterText))
+                );
 
         return templateRepository.findAll(spec, pageable)
             .map(template -> LegalProseTemplateMapper.toLegalProseTemplateDto(template));
@@ -94,9 +97,11 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
         LegalProseTemplate template = new LegalProseTemplate()
                 .id(id)
                 .name(request.getName())
+                .category(request.getCategory())
                 .description(request.getDescription());
 
-// TODO:  reinstate this when ID&P is able to support the issuance of a DID for prose templates
+        template.status(TemplateStatus.ACTIVE); // REMOVE when we have DID creation etc.
+
 //        try {
 //            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
 //            identityClient.createDID(callbackUrl, authData.getAuthToken());

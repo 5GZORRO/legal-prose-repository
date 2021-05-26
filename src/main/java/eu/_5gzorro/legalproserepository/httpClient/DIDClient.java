@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value="didClient", url = "${integrations.identity-permissions.apiBaseUrl}")
 public interface DIDClient {
 
-    @RequestMapping(method = RequestMethod.GET, value = "/holder/create_did")
+    @RequestMapping(method = RequestMethod.POST, value = "/holder/create_did")
     void create(@RequestParam(value="handler_url") String handlerUrl, @RequestParam(value="token") String authToken);
+
+//    @RequestMapping(method = RequestMethod.GET, value = "/holder/read_stakeholder_status")
+//    String getAuthToken(@RequestParam(value="token") String authToken);
 }

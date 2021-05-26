@@ -9,6 +9,7 @@ import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.AuthData;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplateFile;
+import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateNotFoundException;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateStatusException;
@@ -39,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -100,7 +102,7 @@ public class LegalProseTemplateServiceImplUnitTests {
         Mockito.when(templateRepository.findAll(Mockito.any(Specification.class), Mockito.any(Pageable.class))).thenReturn(expectedPage);
 
         // when
-        Page<LegalProseTemplateDto> result = templateService.getLegalProseTemplates(PageRequest.of(0, 10), "template 1");
+        Page<LegalProseTemplateDto> result = templateService.getLegalProseTemplates(PageRequest.of(0, 10), Collections.emptyList(), "template 1");
 
         // then
         assertEquals(expectedPage.getSize(), result.getSize());
@@ -213,7 +215,8 @@ public class LegalProseTemplateServiceImplUnitTests {
                 .id(expectedId)
                 .name("t1")
                 .description(("template 1 description"))
-                .status(TemplateStatus.CREATING);
+                .status(TemplateStatus.ACTIVE);
+//                .status(TemplateStatus.CREATING);
 
         LegalProseTemplateFile fileEntity = new LegalProseTemplateFile();
         fileEntity.setData(templateFile.getBytes());

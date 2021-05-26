@@ -12,6 +12,7 @@ public class LegalProseTemplateMapper {
         dto.setId(template.didAssigned() ? template.getDid() : template.getId().toString());
         dto.setName(template.getName());
         dto.setDescription(template.getDescription());
+        dto.setCategory(template.getCategory());
         dto.setStatus(template.getStatus());
         dto.setStatusUpdated(template.getStatusUpdated());
         dto.setArchived(template.getArchived());
@@ -27,6 +28,7 @@ public class LegalProseTemplateMapper {
         dto.setId(template.didAssigned() ? template.getDid() : template.getId().toString());
         dto.setName(template.getName());
         dto.setDescription(template.getDescription());
+        dto.setCategory(template.getCategory());
         dto.setStatus(template.getStatus());
         dto.setStatusUpdated(template.getStatusUpdated());
         dto.setArchived(template.getArchived());
