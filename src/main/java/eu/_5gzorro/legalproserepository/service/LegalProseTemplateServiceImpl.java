@@ -1,12 +1,13 @@
 package eu._5gzorro.legalproserepository.service;
 
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
-import eu._5gzorro.legalproserepository.controller.v1.response.ProposalResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
+import eu._5gzorro.legalproserepository.httpClient.requests.CreateDidRequest;
 import eu._5gzorro.legalproserepository.model.AuthData;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplateFile;
+import eu._5gzorro.legalproserepository.model.enumureration.CredentialRequestType;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
 import eu._5gzorro.legalproserepository.model.exception.*;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -100,15 +102,18 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
                 .category(request.getCategory())
                 .description(request.getDescription());
 
-        template.status(TemplateStatus.ACTIVE); // REMOVE when we have DID creation etc.
+        try {
+            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
+            CreateDidRequest didRequest = new CreateDidRequest()
+                    .callbackUrl(callbackUrl)
+                    .claims(Collections.emptyList())
+                    .type(CredentialRequestType.LegalProseTemplate);
 
-//        try {
-//            String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
-//            identityClient.createDID(callbackUrl, authData.getAuthToken());
-//        }
-//        catch (Exception ex) {
-//            throw new DIDCreationException(ex);
-//        }
+            identityClient.createDID(didRequest);
+        }
+        catch (Exception ex) {
+            throw new DIDCreationException(ex);
+        }
 
         try {
             LegalProseTemplateFile templateFile = new LegalProseTemplateFile();
@@ -186,7 +191,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
                 .orElseThrow(() -> new LegalProseTemplateNotFoundException(id.toString()));
 
         if(template.getStatus() != TemplateStatus.CREATING)
-            throw new LegalProseTemplateStatusException(TemplateStatus.PROPOSED, template.getStatus());
+            throw new LegalProseTemplateStatusException(TemplateStatus.CREATING, template.getStatus());
 
         template = template
                 .did(did)

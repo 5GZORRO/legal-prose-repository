@@ -215,8 +215,7 @@ public class LegalProseTemplateServiceImplUnitTests {
                 .id(expectedId)
                 .name("t1")
                 .description(("template 1 description"))
-                .status(TemplateStatus.ACTIVE);
-//                .status(TemplateStatus.CREATING);
+                .status(TemplateStatus.CREATING);
 
         LegalProseTemplateFile fileEntity = new LegalProseTemplateFile();
         fileEntity.setData(templateFile.getBytes());
