@@ -89,7 +89,7 @@ public interface LegalProseTemplatesController {
             @ApiResponse(responseCode = "404", description = "A prose template couldn't be found with the provided id",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @PutMapping("{id}/identity}")
+    @PutMapping("{id}/identity")
     ResponseEntity<Void> updateTemplateIdentity(@PathVariable final UUID id, @Valid @RequestBody final DIDStateDto state);
 
 
