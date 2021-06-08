@@ -51,7 +51,7 @@ jobs:
           --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }} \
           --set postgres.name=operator_a_legal_prose \
           --set service.prefix=/operatora/legal-prose-repository \
-          --set governanceBaseUrl="http://172.28.3.111/operatora/governance/" \
+          --set governanceBaseUrl="http://172.28.3.111/operatora/governance/api/v1" \
           --set identityBaseUrl="http://172.28.3.153:6200" \
           --set callbacks.updateTemplateIdentity="http://172.28.3.111/operatora/legal-prose-repository/api/v1/legal-prose-templates/%s/identity"
     - name: Deploy LPR API to regulatora
@@ -66,6 +66,6 @@ jobs:
           --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }} \
           --set postgres.name=operator_a_legal_prose \
           --set service.prefix=/regulatora/legal-prose-repository \
-          --set governanceBaseUrl="http://172.28.3.111/regulatora/governance/" \
+          --set governanceBaseUrl="http://172.28.3.111/regulatora/governance/api/v1" \
           --set identityBaseUrl="http://172.28.3.153:6300" \
           --set callbacks.updateTemplateIdentity="http://172.28.3.111/regulatora/legal-prose-repository/api/v1/legal-prose-templates/%s/identity"

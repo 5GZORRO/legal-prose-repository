@@ -69,7 +69,7 @@ public class GovernanceManagerClientImpl implements GovernanceManagerClient {
 
             StatusLine status = response.getStatusLine();
 
-            if(status.getStatusCode() == HttpStatus.SC_OK) {
+            if(status.getStatusCode() == HttpStatus.SC_ACCEPTED) {
                 return EntityUtils.toString(response.getEntity());
             }
             else {
