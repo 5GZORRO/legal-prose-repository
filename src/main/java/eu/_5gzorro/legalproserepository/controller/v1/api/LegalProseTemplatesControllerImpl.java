@@ -4,6 +4,8 @@ import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateReq
 import eu._5gzorro.legalproserepository.controller.v1.response.PagedTemplateResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
+import eu._5gzorro.legalproserepository.dto.identityPermissions.CredentialOfferDto;
+import eu._5gzorro.legalproserepository.dto.identityPermissions.CredentialPreviewDto;
 import eu._5gzorro.legalproserepository.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.legalproserepository.model.AuthData;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
@@ -71,7 +73,25 @@ public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesCon
     }
 
     public ResponseEntity<Void> updateTemplateIdentity(final UUID id, final DIDStateDto state) {
-        templateService.completeTemplateCreation(id, state.getDid());
+
+        CredentialOfferDto offer = state.getCredentialOffer();
+
+        // return oK for status updates prior to the credential being issued
+        if(offer == null)
+            return ResponseEntity.ok().build();
+
+        CredentialPreviewDto preview = offer.getCredentialPreview();
+
+        if(preview == null)
+            return ResponseEntity.ok().build();
+
+        String did = state.getCredentialOffer().getCredentialPreview().getDid();
+
+        if(did == null)
+            return ResponseEntity.badRequest().build();
+
+
+        templateService.completeTemplateCreation(id, did);
 
         return ResponseEntity
                 .ok()
