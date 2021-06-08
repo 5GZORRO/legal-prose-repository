@@ -26,4 +26,18 @@ public class MockHelpers {
         return mockResponse;
     }
 
+    public static CloseableHttpResponse buildMock202Response(Optional<String> responseBody) {
+        ProtocolVersion protocolVersion = new ProtocolVersion("HTTP", 1, 1);
+        String reasonPhrase = "ACCEPTED";
+        StatusLine statusline = new BasicStatusLine(protocolVersion, HttpStatus.SC_ACCEPTED, reasonPhrase);
+        MockCloseableHttpResponse mockResponse = new MockCloseableHttpResponse(statusline);
+        BasicHttpEntity entity = new BasicHttpEntity();
+
+        if (responseBody.isPresent())
+            entity.setContent(new ByteArrayInputStream(responseBody.get().getBytes()));
+
+        mockResponse.setEntity(entity);
+        return mockResponse;
+    }
+
 }

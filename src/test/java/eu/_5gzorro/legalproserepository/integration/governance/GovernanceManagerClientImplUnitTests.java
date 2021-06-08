@@ -58,7 +58,7 @@ public class GovernanceManagerClientImplUnitTests {
         // given
         String proseTemplateId = "template1";
         String mockedProposalId = "proposal1";
-        CloseableHttpResponse mockedResponse = MockHelpers.buildMock200Response(Optional.of(mockedProposalId));
+        CloseableHttpResponse mockedResponse = MockHelpers.buildMock202Response(Optional.of(mockedProposalId));
         when(httpClient.execute(any(HttpPost.class))).thenReturn(mockedResponse);
 
         // when
@@ -91,7 +91,7 @@ public class GovernanceManagerClientImplUnitTests {
         // given
         String proseTemplateId = "template1";
         String mockedProposalId = "proposal1";
-        CloseableHttpResponse mockedResponse = MockHelpers.buildMock200Response(Optional.of(mockedProposalId));
+        CloseableHttpResponse mockedResponse = MockHelpers.buildMock202Response(Optional.of(mockedProposalId));
         when(httpClient.execute(any(HttpPost.class))).thenReturn(mockedResponse);
 
         // when
