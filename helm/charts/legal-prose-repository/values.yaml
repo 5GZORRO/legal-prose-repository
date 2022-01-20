@@ -10,9 +10,9 @@ serviceAccount:
 replicaCount: 1
 service:
     name: legal-prose-app
-    type: ClusterIP
+    type: NodePort
     appPort: 8081
-    extAppPort: 80
+    extAppPort: 31087
 
 image:
     pullPolicy: IfNotPresent
@@ -29,10 +29,10 @@ podSecurityContext: {}
 securityContext: {}
 
 imagePullSecrets:
-    [name: regcred-zorro]
+    [name: regcred-sclcm]
 
 postgres:
-    host: postgresql.postgres.svc.cluster.local
+    host: postgres.postgres.svc.cluster.local
     port: 5432
 
 probePath: /actuator/health

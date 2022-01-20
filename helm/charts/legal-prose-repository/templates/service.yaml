@@ -15,13 +15,10 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-  - name: app
-    port: {{ .Values.service.extAppPort }}
-    targetPort: {{ .Values.service.appPort }}
-    protocol: TCP
   - name: http
     port: {{ .Values.service.appPort }}
     protocol: TCP
     targetPort: {{ .Values.service.appPort }}
+    nodePort: {{ .Values.service.extAppPort }}
   selector:
     app: {{ include "legal-prose-repository-api.fullname" . }}
