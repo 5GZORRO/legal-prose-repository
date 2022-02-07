@@ -1,5 +1,4 @@
 server:
-  hostname: ${SERVER_HOSTNAME:localhost:8080}
   port: ${SERVER_PORT:8080}
   servlet:
     context-path: /legal-prose-repository

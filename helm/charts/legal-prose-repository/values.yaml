@@ -11,7 +11,7 @@ replicaCount: 1
 service:
     name: legal-prose-app
     type: NodePort
-    appPort: 8081
+    appPort: 8080
     extAppPort: 31084
 
 image:
