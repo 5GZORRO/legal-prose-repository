@@ -35,10 +35,10 @@ postgres:
     host: postgres.postgres.svc.cluster.local
     port: 5432
 
-probePath: /actuator/health
-
 spring:
     profiles: staging
+
+probePath: /legal-prose-repository/actuator/health
 
 livenessProbe:
   initialDelaySeconds: 30
