@@ -12,6 +12,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+@Disabled
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {GovernanceManagerClientImplUnitTests.GovernanceManagerClientImplUnitTestsContextConfiguration.class })
 @TestPropertySource(properties = { "integrations.governanceManager.apiBaseUrl=http://governance.com" })

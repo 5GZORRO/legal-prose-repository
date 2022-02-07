@@ -3,13 +3,11 @@ package eu._5gzorro.legalproserepository;
 
 import eu._5gzorro.legalproserepository.config.Config;
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
-import eu._5gzorro.legalproserepository.controller.v1.response.ProposalResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.model.AuthData;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplateFile;
-import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateStatus;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateNotFoundException;
 import eu._5gzorro.legalproserepository.model.exception.LegalProseTemplateStatusException;
@@ -17,10 +15,8 @@ import eu._5gzorro.legalproserepository.repository.LegalProseTemplateRepository;
 import eu._5gzorro.legalproserepository.service.LegalProseTemplateService;
 import eu._5gzorro.legalproserepository.service.LegalProseTemplateServiceImpl;
 import eu._5gzorro.legalproserepository.service.integration.governance.GovernanceManagerClient;
-import eu._5gzorro.legalproserepository.service.integration.governance.GovernanceManagerClientImpl;
 import eu._5gzorro.legalproserepository.service.integration.identity.IdentityAndPermissionsApiClient;
 import eu._5gzorro.legalproserepository.utils.UuidSource;
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -417,7 +413,7 @@ public class LegalProseTemplateServiceImplUnitTests {
                 .status(TemplateStatus.ACTIVE);
 
         when(templateRepository.findByDid(did)).thenReturn(Optional.of(t1));
-        when(governanceManagerClient.proposeArchiveTemplate(anyString())).thenReturn(createdProposalId);
+        //when(governanceManagerClient.proposeArchiveTemplate(anyString())).thenReturn(createdProposalId);
 
         // when
         templateService.archiveLegalProseTemplate(requestingStakeholderId, did);
@@ -426,8 +422,7 @@ public class LegalProseTemplateServiceImplUnitTests {
 
         // then
         verify(templateRepository, times(1)).save(updatedTemplate);
-        verify(governanceManagerClient, times(1)).proposeArchiveTemplate(did);
-
+        //verify(governanceManagerClient, times(1)).proposeArchiveTemplate(did);
     }
 
 
