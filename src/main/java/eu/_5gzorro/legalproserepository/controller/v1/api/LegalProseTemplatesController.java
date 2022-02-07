@@ -5,7 +5,7 @@ import eu._5gzorro.legalproserepository.controller.v1.request.constraint.ValidAc
 import eu._5gzorro.legalproserepository.controller.v1.response.PagedTemplateResponse;
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
-import eu._5gzorro.legalproserepository.dto.identityPermissions.DIDStateDto;
+import eu._5gzorro.legalproserepository.dto.identityPermissions.DIDStateCSDto;
 import eu._5gzorro.legalproserepository.model.PageableOperation;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,6 +70,7 @@ public interface LegalProseTemplatesController {
              @RequestPart(name = "templateFile") @ValidAccordTemplate final MultipartFile templateFile);
 
 
+    @Deprecated
     @Operation(description = "Approve/Reject a newly proposed template or proposal to remove a template", tags= { "admin" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The prose template status was updated successfully"),
@@ -90,7 +91,7 @@ public interface LegalProseTemplatesController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("{id}/identity")
-    ResponseEntity<Void> updateTemplateIdentity(@PathVariable final UUID id, @Valid @RequestBody final DIDStateDto state);
+    ResponseEntity<Void> updateTemplateIdentity(@PathVariable final UUID id, @Valid @RequestBody final DIDStateCSDto state);
 
 
     @Operation(description = "Propose the removal of a Legal Prose Template by DID. The request will be subject to a governance process before becoming available in the marketplace", tags= { "trader", "admin" })
@@ -102,5 +103,5 @@ public interface LegalProseTemplatesController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @DeleteMapping("{did}")
-    ResponseEntity<String> removeLegalProseTemplate(@PathVariable String did);
+    ResponseEntity<Void> removeLegalProseTemplate(@PathVariable String did);
 }

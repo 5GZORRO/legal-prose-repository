@@ -12,7 +12,7 @@ service:
     name: legal-prose-app
     type: NodePort
     appPort: 8081
-    extAppPort: 31087
+    extAppPort: 31084
 
 image:
     pullPolicy: IfNotPresent

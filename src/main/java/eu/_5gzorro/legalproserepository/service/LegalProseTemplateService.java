@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface LegalProseTemplateService {
+
     Page<LegalProseTemplateDto> getLegalProseTemplates(Pageable pageable, List<TemplateCategory> categoryFilter, String filterText);
     LegalProseTemplateDetailDto getLegalProseTemplateById(UUID id);
     LegalProseTemplateDetailDto getLegalProseTemplateByDid(String did);
@@ -25,14 +26,14 @@ public interface LegalProseTemplateService {
      */
     UUID createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file);
 
-  /**
-   * Complete the process of creating the template by assigning the provided DID to the template.
-   * Generates a governance proposal for admins to vote on, the result of the subsequent
-   * proposal voting will determine the availability of the template in the marketplace
-   * @param id
-   * @param did
-   */
-  void completeTemplateCreation(UUID id, String did);
+    /**
+    * Complete the process of creating the template by assigning the provided DID to the template.
+    * Generates a governance proposal for admins to vote on, the result of the subsequent
+    * proposal voting will determine the availability of the template in the marketplace
+    * @param id
+    * @param did
+    */
+    void completeTemplateCreation(UUID id, String did);
 
     /**
      * Update the status of the prose template based on the outcome of the governance process
@@ -50,5 +51,5 @@ public interface LegalProseTemplateService {
      * @param did
      * @return the the PROPOSAL Identifier
      */
-    String archiveLegalProseTemplate(String requestingStakeholderId, String did);
+    void archiveLegalProseTemplate(String requestingStakeholderId, String did);
 }

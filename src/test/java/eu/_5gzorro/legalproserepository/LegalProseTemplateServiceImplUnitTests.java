@@ -420,14 +420,13 @@ public class LegalProseTemplateServiceImplUnitTests {
         when(governanceManagerClient.proposeArchiveTemplate(anyString())).thenReturn(createdProposalId);
 
         // when
-        String result = templateService.archiveLegalProseTemplate(requestingStakeholderId, did);
+        templateService.archiveLegalProseTemplate(requestingStakeholderId, did);
 
         final LegalProseTemplate updatedTemplate = t1.status(TemplateStatus.ARCHIVE_PROPOSED);
 
         // then
         verify(templateRepository, times(1)).save(updatedTemplate);
         verify(governanceManagerClient, times(1)).proposeArchiveTemplate(did);
-        assertEquals(createdProposalId, result);
 
     }
 

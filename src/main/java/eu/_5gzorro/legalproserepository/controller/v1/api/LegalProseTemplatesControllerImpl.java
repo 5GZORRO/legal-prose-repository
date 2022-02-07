@@ -4,9 +4,7 @@ import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateReq
 import eu._5gzorro.legalproserepository.controller.v1.response.PagedTemplateResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
-import eu._5gzorro.legalproserepository.dto.identityPermissions.CredentialOfferDto;
-import eu._5gzorro.legalproserepository.dto.identityPermissions.CredentialPreviewDto;
-import eu._5gzorro.legalproserepository.dto.identityPermissions.DIDStateDto;
+import eu._5gzorro.legalproserepository.dto.identityPermissions.*;
 import eu._5gzorro.legalproserepository.model.AuthData;
 import eu._5gzorro.legalproserepository.model.enumureration.TemplateCategory;
 import eu._5gzorro.legalproserepository.service.LegalProseTemplateService;
@@ -67,35 +65,22 @@ public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesCon
 
         UUID templateId = templateService.createLegalProseTemplate(requestingStakeholderId, proposeTemplateRequest, templateFile);
 
-        return ResponseEntity
-                .ok()
-                .body(templateId.toString());
+        return ResponseEntity.ok().body(templateId.toString());
     }
 
-    public ResponseEntity<Void> updateTemplateIdentity(final UUID id, final DIDStateDto state) {
+    public ResponseEntity<Void> updateTemplateIdentity(final UUID id, final DIDStateCSDto state) {
 
-        CredentialOfferDto offer = state.getCredentialOffer();
+        CredentialSubjectDto credentialSubjectDto = state.getCredentialSubjectDto();
+        if(credentialSubjectDto == null)
+            return ResponseEntity.badRequest().build();
 
-        // return oK for status updates prior to the credential being issued
-        if(offer == null)
-            return ResponseEntity.ok().build();
-
-        CredentialPreviewDto preview = offer.getCredentialPreview();
-
-        if(preview == null)
-            return ResponseEntity.ok().build();
-
-        String did = state.getCredentialOffer().getCredentialPreview().getDid();
+        String did = credentialSubjectDto.getId();
 
         if(did == null)
             return ResponseEntity.badRequest().build();
 
-
         templateService.completeTemplateCreation(id, did);
-
-        return ResponseEntity
-                .ok()
-                .build();
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<Void> setLegalStatementTemplateApprovalStatus(final String did, final boolean accept) {
@@ -107,14 +92,12 @@ public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesCon
                 .build();
     }
 
-    public ResponseEntity<String> removeLegalProseTemplate(String id) {
+    public ResponseEntity<Void> removeLegalProseTemplate(String id) {
 
         final String requestingStakeholderId = authData.getUserId();
 
-        String proposalId = templateService.archiveLegalProseTemplate(requestingStakeholderId, id);
+        templateService.archiveLegalProseTemplate(requestingStakeholderId, id);
 
-        return ResponseEntity
-                .ok()
-                .body(proposalId);
+        return ResponseEntity.ok().build();
     }
 }

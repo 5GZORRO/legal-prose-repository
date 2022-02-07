@@ -1,16 +1,30 @@
+server:
+  hostname: ${SERVER_HOSTNAME:localhost:8080}
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /legal-prose-repository
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui
+    enabled: true
+
 spring:
   profiles:
     active:
-      - dev
-  jpa:
-    hibernate:
-      ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-  datasource:
-    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}:${POSTGRES_DB_PORT:5432}/${POSTGRES_DB_NAME:governance}
-    driverClassName: org.postgresql.Driver
-    username: ${POSTGRES_DB_USER:5gzorro_admin}
-    password: ${POSTGRES_DB_PASSWORD:5gzorro}
+      - staging
+jpa:
+  hibernate:
+    ddl-auto: update
+  database-platform: org.hibernate.dialect.PostgreSQLDialect
+datasource:
+  url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}:${POSTGRES_DB_PORT:5432}/${POSTGRES_DB_NAME:governance}
+  driverClassName: org.postgresql.Driver
+  username: ${POSTGRES_DB_USER:5gzorro_admin}
+  password: ${POSTGRES_DB_PASSWORD:5gzorro}
 
 integrations:
   identity-permissions:
@@ -19,7 +33,4 @@ integrations:
     apiBaseUrl: ${GOVERNANCE_BASE_URL:http://localhost:8080/api/v1}
 
 callbacks:
-  updateTemplateIdentity: ${UPDATE_TEMPLATE_IDENTITY_CALLBACK_URL:http://localhost:8081/api/v1/legal-prose-templates/%s/identity}
-
-server:
-  forward-headers-strategy: framework
+  updateTemplateIdentity: ${UPDATE_TEMPLATE_IDENTITY_CALLBACK_URL:http://localhost:8080/legal-prose-repository/api/v1/legal-prose-templates/%s/identity}

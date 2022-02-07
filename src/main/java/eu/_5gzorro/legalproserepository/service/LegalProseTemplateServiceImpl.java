@@ -4,7 +4,6 @@ import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateReq
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDto;
 import eu._5gzorro.legalproserepository.httpClient.requests.CreateDidRequest;
-import eu._5gzorro.legalproserepository.model.AuthData;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplate;
 import eu._5gzorro.legalproserepository.model.entity.LegalProseTemplateFile;
 import eu._5gzorro.legalproserepository.model.enumureration.CredentialRequestType;
@@ -14,12 +13,10 @@ import eu._5gzorro.legalproserepository.model.exception.*;
 import eu._5gzorro.legalproserepository.model.mapper.LegalProseTemplateMapper;
 import eu._5gzorro.legalproserepository.repository.LegalProseTemplateRepository;
 import eu._5gzorro.legalproserepository.repository.specification.LegalProseTemplateSpecs;
-import eu._5gzorro.legalproserepository.service.integration.governance.GovernanceManagerClient;
 import eu._5gzorro.legalproserepository.service.integration.identity.IdentityAndPermissionsApiClient;
 import eu._5gzorro.legalproserepository.utils.UuidSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -43,19 +40,10 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
     LegalProseTemplateRepository templateRepository;
 
     @Autowired
-    ModelMapper mapper;
-
-    @Autowired
-    GovernanceManagerClient governanceManagerClient;
-
-    @Autowired
     IdentityAndPermissionsApiClient identityClient;
 
     @Autowired
     UuidSource uuidSource;
-
-    @Autowired
-    AuthData authData;
 
     @Value("${callbacks.updateTemplateIdentity}")
     private String updateTemplateIdentityCallbackUrl;
@@ -91,7 +79,6 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
     }
 
     @Override
-    @Transactional
     public UUID createLegalProseTemplate(String requestingStakeholderId, ProposeTemplateRequest request, MultipartFile file) {
 
         UUID id = uuidSource.newUUID();
@@ -101,6 +88,17 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
                 .name(request.getName())
                 .category(request.getCategory())
                 .description(request.getDescription());
+
+        try {
+            LegalProseTemplateFile templateFile = new LegalProseTemplateFile();
+            templateFile.setData(file.getBytes());
+            template.addFile(templateFile);
+        } catch (IOException e) {
+            log.error("Error creating prose template", e);
+            throw new LegalProseTemplateIOException(e);
+        }
+
+        templateRepository.save(template);
 
         try {
             String callbackUrl = String.format(updateTemplateIdentityCallbackUrl, id);
@@ -115,21 +113,10 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
             throw new DIDCreationException(ex);
         }
 
-        try {
-            LegalProseTemplateFile templateFile = new LegalProseTemplateFile();
-            templateFile.setData(file.getBytes());
-            template.addFile(templateFile);
-        }
-        catch (IOException e) {
-            log.error("Error creating prose template", e);
-            throw new LegalProseTemplateIOException(e);
-        }
-
-        templateRepository.save(template);
-
         return id;
     }
 
+    @Deprecated
     @Override
     @Transactional
     public void setLegalProseTemplateStatus(String did, boolean approved) {
@@ -159,7 +146,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
     @Override
     @Transactional
-    public String archiveLegalProseTemplate(String requestingStakeholderId, String did) {
+    public void archiveLegalProseTemplate(String requestingStakeholderId, String did) {
 
         LegalProseTemplate template = templateRepository.findByDid(did)
                 .orElseThrow(() -> new LegalProseTemplateNotFoundException(did));
@@ -174,18 +161,13 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
 
         template.status(TemplateStatus.ARCHIVE_PROPOSED);
         templateRepository.save(template);
-
-        try {
-            return governanceManagerClient.proposeArchiveTemplate(template.getDid());
-        }
-        catch(Exception ex) {
-            log.error("Failed to create governance proposal when archiving prose template.", ex);
-            throw new GovernanceProposalCreationFailed();
-        }
     }
 
+    @Override
     @Transactional
     public void completeTemplateCreation(UUID id, String did) {
+
+        log.info("Updating LP Template {} with DID {}", id, did);
 
         LegalProseTemplate template = templateRepository.findById(id)
                 .orElseThrow(() -> new LegalProseTemplateNotFoundException(id.toString()));
@@ -193,17 +175,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
         if(template.getStatus() != TemplateStatus.CREATING)
             throw new LegalProseTemplateStatusException(TemplateStatus.CREATING, template.getStatus());
 
-        template = template
-                .did(did)
-                .status(TemplateStatus.PROPOSED);
-
-        try {
-            String proposalId = governanceManagerClient.proposeNewTemplate(template.getDid());
-        }
-        catch(Exception ex) {
-            log.error("Failed to create governance proposal for new prose template.", ex);
-            throw new GovernanceProposalCreationFailed();
-        }
+        template = template.did(did).status(TemplateStatus.ACTIVE);
 
         templateRepository.save(template);
     }
