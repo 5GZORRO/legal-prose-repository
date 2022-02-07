@@ -485,10 +485,10 @@ public class LegalProseTemplateServiceImplUnitTests {
         // when
         templateService.completeTemplateCreation(id, did);
 
-        final LegalProseTemplate updatedTemplate = t1.did(did).status(TemplateStatus.PROPOSED);
+        final LegalProseTemplate updatedTemplate = t1.did(did).status(TemplateStatus.ACTIVE);
 
         // then
         verify(templateRepository, times(1)).save(updatedTemplate);
-        verify(governanceManagerClient, times(1)).proposeNewTemplate(did);
+        //verify(governanceManagerClient, times(1)).proposeNewTemplate(did);
     }
 }
