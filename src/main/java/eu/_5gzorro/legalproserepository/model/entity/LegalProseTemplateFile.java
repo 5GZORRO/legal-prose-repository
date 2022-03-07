@@ -20,6 +20,7 @@ public class LegalProseTemplateFile {
     private LegalProseTemplate legalProseTemplate;
 
     @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
     private byte[] data;
 
     public LegalProseTemplateFile() {}
