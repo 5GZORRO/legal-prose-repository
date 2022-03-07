@@ -17,7 +17,7 @@ spring:
       - staging
 jpa:
   hibernate:
-    ddl-auto: update
+    ddl-auto: create
   database-platform: org.hibernate.dialect.PostgreSQLDialect
 datasource:
   url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}:${POSTGRES_DB_PORT:5432}/${POSTGRES_DB_NAME:governance}
