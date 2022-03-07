@@ -92,11 +92,11 @@ public class LegalProseTemplatesControllerImpl implements LegalProseTemplatesCon
                 .build();
     }
 
-    public ResponseEntity<Void> removeLegalProseTemplate(String id) {
+    public ResponseEntity<Void> removeLegalProseTemplate(String did) {
 
         final String requestingStakeholderId = authData.getUserId();
 
-        templateService.archiveLegalProseTemplate(requestingStakeholderId, id);
+        templateService.archiveLegalProseTemplate(requestingStakeholderId, did);
 
         return ResponseEntity.ok().build();
     }

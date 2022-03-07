@@ -159,7 +159,7 @@ public class LegalProseTemplateServiceImpl implements LegalProseTemplateService 
             throw new LegalProseTemplateStatusException(TemplateStatus.ACTIVE, template.getStatus());
         }
 
-        template.status(TemplateStatus.ARCHIVE_PROPOSED);
+        template.status(TemplateStatus.ARCHIVED);
         templateRepository.save(template);
     }
 
