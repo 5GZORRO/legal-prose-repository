@@ -15,19 +15,19 @@ spring:
   profiles:
     active:
       - staging
-jpa:
-  hibernate:
-    ddl-auto: create
-  database-platform: org.hibernate.dialect.PostgreSQLDialect
-datasource:
-  url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}:${POSTGRES_DB_PORT:5432}/${POSTGRES_DB_NAME:governance}
-  driverClassName: org.postgresql.Driver
-  username: ${POSTGRES_DB_USER:5gzorro_admin}
-  password: ${POSTGRES_DB_PASSWORD:5gzorro}
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}:${POSTGRES_DB_PORT:5432}/${POSTGRES_DB_NAME:postgres}
+    driverClassName: org.postgresql.Driver
+    username: ${POSTGRES_DB_USER:postgres}
+    password: ${POSTGRES_DB_PASSWORD:postgres}
 
 integrations:
   identity-permissions:
-    myAgentBaseUrl: ${IDENTITY_BASE_URL:http://localhost:6200}
+    myAgentBaseUrl: ${IDENTITY_BASE_URL:http://172.28.3.153:6200}
   governanceManager:
     apiBaseUrl: ${GOVERNANCE_BASE_URL:http://localhost:8080/api/v1}
 
