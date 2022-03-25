@@ -1,7 +1,6 @@
 package eu._5gzorro.legalproserepository.controller.v1.api;
 
 import eu._5gzorro.legalproserepository.controller.v1.request.ProposeTemplateRequest;
-import eu._5gzorro.legalproserepository.controller.v1.request.constraint.ValidAccordTemplate;
 import eu._5gzorro.legalproserepository.controller.v1.response.PagedTemplateResponse;
 import eu._5gzorro.legalproserepository.dto.ApiErrorResponse;
 import eu._5gzorro.legalproserepository.dto.LegalProseTemplateDetailDto;
@@ -67,7 +66,7 @@ public interface LegalProseTemplatesController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<String> proposeNewLegalProseTemplate(
              @RequestPart(name = "proposeTemplateRequest") @Valid final ProposeTemplateRequest proposeTemplateRequest,
-             @RequestPart(name = "templateFile") @ValidAccordTemplate final MultipartFile templateFile);
+             @RequestPart(name = "templateFile") final MultipartFile templateFile);
 
 
     @Deprecated
