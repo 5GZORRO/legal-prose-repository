@@ -28,6 +28,7 @@ spring:
 integrations:
   identity-permissions:
     myAgentBaseUrl: ${IDENTITY_BASE_URL:http://172.28.3.153:6200}
+    did: ${IDENTITY_DID:OD1ndI3xw0Pi6Sl4rgoa6F}
   governanceManager:
     apiBaseUrl: ${GOVERNANCE_BASE_URL:http://localhost:8080/api/v1}
 
