@@ -1,36 +1,81 @@
 # Legal Prose Repository
 
+## Introduction
+The main scope of the Legal Prose Repository (LPR) is to provide a storage service for
+the legal templates used in 5GZORRO Platform as baseline for the creation of legal
+documents such as Service Level Agreements and Licenses
+
 The project encapsulates the Legal Prose Repository module of the 5GZORRO platform. 
 It is a SpringBoot application with associated documentation built from Swagger annotations.
 
-## Getting Started
-To run the application using Maven simply execute the following from the command-line:
+![lpr architecture](docs/img/LPR_sw_arc.png)
 
-`./mvnw spring-boot:run`
+## Prerequisites
 
-### Start Database
-To start a dev instance of potgres, simply execute the following docker-compose command in a terminal in the root of the project:
+### System Requirements
+- 1 vCPU
+- 2GB RAM
 
-`docker-compose up`
+### Software dependencies
+- PostgreSQL </br>
+  ```bash
+  docker run --name some-postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
+  ```
 
-This will start an instance of postgres on the usual localhost:5432 and the username/password to access the database can be found in `./database.env`
+If you want to deploy LPR in a not-virtualized environment you'll need also:
 
-### Stop the database
-To stop the database:
-`docker-compose down` (add the flag `-v` to remove the persisted volumn/state as well)
+- Java 11 </br>
+  ```bash
+  sudo apt update
+  sudo apt install openjdk-11-jdk
+  ```
+- Maven </br>
+  ```bash
+    sudo apt update
+    sudo apt install maven
+    ```
 
-### Staging Database
-IMPORTANT: It is intentional that all admin domains are using the same governance db in the staging environment.  
+### 5GZORRO Module dependencies
+- [Identity and Permission Manager](https://github.com/5GZORRO/identity)
 
-Simulating shared access to a common DB for the purposes of administering the platform.  For our purposes, Operator A is hosting this DB.
+## Installation
+The following procedures consider the previously listed dependencies already up and running.
+Both the installation procedures reported below require the creation of the required database in the running
+postgres instance. Run the following commands in order to create them:
+```bash
+docker exec -it <postgres_docker_id> /bin/bash
+su postgres
+createdb operator_x_legal_prose;
+```
 
-You can see this configuration in `/.github/workflows/publish-package.yml`
+### Local Machine
+Run
+```bash
+export spring_profiles_active=staging
+./mvnw spring-boot:run
+```
 
-## Documentation
+### Helm
+The following instructions consider the previously listed dependencies already up and running.
+```bash
+helm install legal-prose-api ./helm/charts/legal-prose-repository/   
+  --namespace operatorx-ns           
+  --values ./helm/charts/legal-prose-repository/values.yaml           
+  --set dockerTag=5gzorro-core-1.7-rc           
+  --set postgres.username=postgres           
+  --set postgres.password=postgres           
+  --set postgres.name=operator_x_legal_prose           
+  --set identityBaseUrl="http://172.28.3.153:6200"   
+  --set identityDID=<stakeholder_did>        
+  --set callbacks.updateTemplateIdentity="http://172.28.3.6:31084/legal-prose-repository/api/v1/legal-prose-templates/%s/identity"
+```
 
-You can access swagger-ui by running the API and navigating to `http://localhost:8080/swagger-ui`
+## Configuration
+No particular configurations are needed.
 
-An open-api schema is also available under `docs/swagger` from the root of the project.
+## Maintainers
+**Pietro Giuseppe Giardina** - *Design* - p.giardina@nextworks.it </br>
+**Michael De Angelis** - *Develop and Design* - m.deangelis@nextworks.it </br>
 
-## Updating OpenAPI swagger-ui file
-This should be completed as a github action but to do manually run ./mvnw springdoc-openapi:generate. This should output an updated openapi.json file at: /docs/swagger based on the spring apis rest controllers
+## License
+This module is distributed under [Apache 2.0 License](LICENSE) terms.
